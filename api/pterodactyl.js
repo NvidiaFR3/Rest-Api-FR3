@@ -1,11 +1,13 @@
 const axios = require('axios');
 
+// Shared utility functions
 function generatePassword(length = 12) {
   const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   return Array.from({ length }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
 }
 
-module.exports = {
+// Pterodactyl Create Module
+const pterodactylCreate = {
   name: "pterodactyl create",
   desc: "Buat user & server otomatis",
   category: "Pterodactyl",
@@ -95,7 +97,8 @@ module.exports = {
   }
 };
 
-module.exports = {
+// Pterodactyl Delete Module
+const pterodactylDelete = {
   name: "pterodactyl delete",
   desc: "Hapus server & user dari panel",
   category: "Pterodactyl",
@@ -140,47 +143,46 @@ module.exports = {
   }
 };
 
-module.exports = {
-  name: "pterodactyl delete",
-  desc: "Hapus server & user dari panel",
+// Pterodactyl List Module (example)
+const pterodactylList = {
+  name: "pterodactyl list",
+  desc: "List servers from panel",
   category: "Pterodactyl",
-  path: "/ptero/delete",
+  path: "/ptero/list",
 
   async run(req, res) {
-    const { domain, PTLC, id } = req.query;
-    if (!domain || !PTLC || !id) {
+    const { domain, PTLC } = req.query;
+    if (!domain || !PTLC) {
       return res.status(400).json({
         status: false,
-        error: "Missing required parameters: domain, PTLC, id"
+        error: "Missing required parameters: domain, PTLC"
       });
     }
 
     const headers = {
       'Authorization': `Bearer ${PTLC}`,
-      'Accept': 'Application/vnd.pterodactyl.v1+json',
-      'Content-Type': 'application/json'
+      'Accept': 'Application/vnd.pterodactyl.v1+json'
     };
 
     try {
-      const serverInfo = (await axios.get(`${domain}/api/application/servers/${id}`, { headers })).data.attributes;
-      await axios.delete(`${domain}/api/application/servers/${id}`, { headers });
-      await axios.delete(`${domain}/api/application/users/${serverInfo.user}`, { headers });
-
+      const response = await axios.get(`${domain}/api/application/servers`, { headers });
       res.json({
         status: true,
-        message: "Server dan user berhasil dihapus",
-        data: {
-          server_id: id,
-          server_name: serverInfo.name,
-          user_id: serverInfo.user
-        }
+        data: response.data.data
       });
     } catch (err) {
       res.status(err.response?.status || 500).json({
         status: false,
         error: err.message,
-        details: err.response?.data?.errors || "Gagal menghapus server/user"
+        details: err.response?.data?.errors || "Gagal mendapatkan list server"
       });
     }
   }
 };
+
+// Export all modules
+module.exports = [
+  pterodactylCreate,
+  pterodactylDelete,
+  pterodactylList
+];
