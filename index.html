@@ -4,13 +4,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   
-  <meta property="og:title" content="Docs - Selfbot API's" />
+  <meta property="og:title" content="Docs - FR3 API's" />
   <meta property="og:description" content="Lightweight API for WhatsApp Bots" />
   <meta property="og:image" content="https://files.catbox.moe/2b3d1b.jpg" />
-  <meta property="og:url" content="https://api-simplebot.vercel.app/" />
+  <meta property="og:url" content="https://api.nvidiabotz.xyz/" />
   
   <link id="icon" rel="icon" href="https://files.catbox.moe/2b3d1b.jpg" type="image/png">  
-  <title id="page">Docs - Selfbot API's</title>
+  <title id="page">Docs - FR3 API's</title>
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
@@ -941,7 +941,7 @@
   <header class="navbar">
     <div class="navbar-container">
       <div class="navbar-left">
-        <span id="navname" class="brand">X-Skycode</span>
+        <span id="navname" class="brand">FR3 DEV</span>
       </div>
       <div class="navbar-right">
         <button id="themeToggle" class="nav-icon" aria-label="Toggle Theme">
@@ -955,14 +955,14 @@
     <section class="hero fade-in">
       <div class="title-container">
         <i class="fas fa-rocket icon-title"></i> 
-        <h2 id="apiTitle">Selfbot API's</h2> 
+        <h2 id="apiTitle">FR3 API's</h2> 
       </div>
       <p>Simple and fast API for full-featured WhatsApp Bot integration with comprehensive documentation and easy-to-use endpoints. Explore our powerful tools to enhance your bot capabilities.</p> 
       <section id="apiLinks">
         <span>Base URL:</span>
         <a id="contactdev" href="#" title="Contact Dev">
           <i class="fas fa-link"></i>
-          <span id="baseUrlText">https://api-simplebot.vercel.app</span> 
+          <span id="baseUrlText">https://api.nvidiabotz.xyz</span> 
         </a>
       </section>
     </section>
@@ -970,6 +970,19 @@
     <section class="content">
       <h2>Available Endpoints</h2> 
       <div class="tabs" id="tabs"></div>
+<div style="margin: 1rem 0;">
+  <input id="searchInput" type="text" placeholder="🔍 Cari endpoint..." style="
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 0.9rem;
+    border: 1px solid var(--border-color);
+    background: var(--input-bg);
+    color: var(--text-secondary);
+    border-radius: var(--border-radius-sm);
+    box-shadow: var(--shadow-sm);
+  ">
+</div>
+
       <div id="api-list" class="api-list"></div>
     </section>
   </div>
@@ -1103,8 +1116,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     apis = await apisResponse.json();
 
-    document.getElementById("navname").textContent = settings.creatorName || "X-Skycode";
-    document.getElementById("apiTitle").textContent = settings.apiTitle || "Selfbot API's";
+    document.getElementById("navname").textContent = settings.creatorName || "FR3 DEV";
+    document.getElementById("apiTitle").textContent = settings.apiTitle || "FR3 API's";
     baseUrlText.textContent = window.location.origin
     document.getElementById("contactdev").href = window.location.origin || "#";
     document.querySelector('footer .contact a[aria-label="WhatsApp"]').href = settings.whatsappLink || "https://wa.me/yourwhatsapplink";
@@ -1120,8 +1133,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   } catch (err) {
     console.error("Error loading API settings or endpoints:", err);
     document.getElementById("page").textContent = "API Documentation (Error)";
-    document.getElementById("navname").textContent = "X-Skycode";
-    document.getElementById("apiTitle").textContent = "Selfbot API's";
+    document.getElementById("navname").textContent = "FR3 DEV";
+    document.getElementById("apiTitle").textContent = "FR3 API's";
     baseUrlText.textContent = window.location.origin
     document.getElementById("contactdev").href = "#";
     apiList.innerHTML = `<p style="text-align: center; color: var(--danger); margin-top: 2rem;">
