@@ -85,7 +85,7 @@ module.exports = [
     name: "Chat GPT",
     desc: "Ai chat gpt models",
     category: "Openai",
-    path: "/ai/chatgpt?apikey=&question=",
+    path: "/ai/chatgpt?question=",
     async run(req, res) {
         const { apikey, question, model, prompt } = req.query;
 
@@ -117,13 +117,9 @@ module.exports = [
     name: "Gemini",
     desc: "Ai gemini models",
     category: "Openai",
-    path: "/ai/gemini?apikey=&question=",
+    path: "/ai/gemini?question=",
     async run(req, res) {
-        const { apikey, question } = req.query;
-
-        if (!apikey || !global.apikey.includes(apikey)) {
-            return res.json({ status: false, error: "Apikey invalid" });
-        }
+        const { question } = req.query;
 
         if (!question) {
             return res.json({ status: false, error: "Parameter 'question' is required" });
