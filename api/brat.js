@@ -9,7 +9,7 @@ module.exports = {
 
     const buffer = await getBuffer(`https://fastrestapis.fasturl.cloud/maker/brat/animated?text=${encodeURIComponent(text)}&mode=animated`);
     res.writeHead(200, {
-      'Content-Type': 'image/gif',
+      'Content-Type': 'image',
       'Content-Length': buffer.length,
     });
     res.end(buffer);
