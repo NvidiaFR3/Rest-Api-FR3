@@ -36,10 +36,9 @@ module.exports = [
   name: "Removebg",
   desc: "Remove background image",
   category: "Imagecreator",
-  path: "/imagecreator/removebg?apikey=&url=",
+  path: "/imagecreator/removebg?url=",
   async run(req, res) {
-    const { apikey, url } = req.query;
-    if (!apikey || !global.apikey.includes(apikey)) return res.json({ status: false, error: "Apikey invalid" });
+    const { url } = req.query;
     if (!url) return res.json({ status: false, error: "Url is required" });
     try {
       const buffer = await getBuffer(url);
