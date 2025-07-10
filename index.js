@@ -81,7 +81,7 @@ app.use((req, res, next) => {
       req.path !== '/set'
     ) {
       return originalJson.call(this, {
-        creator: settings.creatorName || "Created Using Skyzo",
+        creator: settings.creatorName || "Created Using FR3 DEV",
         ...data
       });
     }
