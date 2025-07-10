@@ -11,7 +11,7 @@ const pterodactylCreate = {
   name: "pterodactyl create",
   desc: "Buat user & server otomatis",
   category: "Pterodactyl",
-  path: "/ptero/create",
+  path: "/ptero/create?domain=&plta=&nameserver=&disk=&cpu=",
 
   async run(req, res) {
     const { domain, plta, nameserver, disk, cpu } = req.query;
