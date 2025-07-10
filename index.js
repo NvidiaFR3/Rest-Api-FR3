@@ -63,7 +63,7 @@ global.totalreq = 0;
 const settings = {
   creatorName: "FR3HOSTING",
   whatsappLink: "https://wa.me/62882008771871",
-  apiTitle: "Selfbot API's",
+  apiTitle: "FR3 API's",
   githubLink: "https://NvidiaFR3",
   instagramLink: "https://wa.me/62882008771871"
 };
