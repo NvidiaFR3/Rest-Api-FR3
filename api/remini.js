@@ -55,10 +55,9 @@ module.exports = [
   name: "Remini",
   desc: "HD quality image",
   category: "Imagecreator",
-  path: "/imagecreator/remini?apikey=&url=",
+  path: "/imagecreator/remini?url=",
   async run(req, res) {
-    const { apikey, url } = req.query;
-    if (!apikey || !global.apikey.includes(apikey)) return res.json({ status: false, error: "Apikey invalid" });
+    const { url } = req.query;
     if (!url) return res.json({ status: false, error: "Url is required" });
     try {
       const buffer = await getBuffer(url);

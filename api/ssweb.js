@@ -2,13 +2,9 @@ module.exports = {
   name: "Ssweb",
   desc: "Screenshot website",
   category: "Tools",
-  path: "/tools/ssweb?apikey=&url=",
+  path: "/tools/ssweb?url=",
   async run(req, res) {
-    const { apikey, url } = req.query;
-
-    if (!apikey || !global.apikey.includes(apikey)) {
-      return res.json({ status: false, error: 'Apikey invalid' });
-    }
+    const { url } = req.query;
 
     if (!url) {
       return res.json({ status: false, error: 'Url is required' });

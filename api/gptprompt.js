@@ -68,17 +68,14 @@ module.exports = {
   name: "GPT Prompt",
   desc: "Ai gpt prompt models",
   category: "Openai",
-  path: "/ai/gpt?apikey=&prompt=&text=",
+  path: "/ai/gpt?prompt=&text=",
 
   async run(req, res) {
-    const { text, prompt, apikey } = req.query;
+    const { text, prompt } = req.query;
 
     if (!text)
       return res.json({ status: false, error: "Text is required" });
 
-    if (!apikey || !global.apikey?.includes(apikey))
-      return res.json({ status: false, error: "Invalid API key" });
-      
 const yourQuestion = text
 const systemPrompt = prompt
 const modelList = [

@@ -57,13 +57,9 @@ module.exports = [
     name: "Grok",
     desc: "Ai grok models",
     category: "Openai",
-    path: "/ai/grok?apikey=&question=",
+    path: "/ai/grok?question=",
     async run(req, res) {
-        const { apikey, question, model, prompt } = req.query;
-
-        if (!apikey || !global.apikey.includes(apikey)) {
-            return res.json({ status: false, error: "Apikey invalid" });
-        }
+        const { question, model, prompt } = req.query;
 
         if (!question) {
             return res.json({ status: false, error: "Parameter 'question' is required" });

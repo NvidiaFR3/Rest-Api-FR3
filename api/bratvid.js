@@ -7,6 +7,7 @@ module.exports = {
   async run(req, res) {
     try {
       const { text } = req.query;
+
       if (!text) {
         return res.json({ status: false, error: 'Text parameter is required' });
       }

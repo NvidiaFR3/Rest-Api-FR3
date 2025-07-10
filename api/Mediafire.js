@@ -4,12 +4,10 @@ module.exports = {
     name: "Mediafire",
     desc: "Mediafire Downloader",
     category: "Downloader",
-    path: "/download/mediafire?apikey=&url=",
+    path: "/download/mediafire?url=",
     async run(req, res) {
       try {
-        const { apikey, url } = req.query;
-        if (!apikey || !global.apikey.includes(apikey))
-          return res.json({ status: false, error: "Apikey invalid" });
+        const { url } = req.query;
         if (!url)
           return res.json({ status: false, error: "Url is required" });
 

@@ -4,13 +4,10 @@ module.exports = {
   name: "Npm Search",
   desc: "Search package nodejs",
   category: "Search",
-  path: "/search/npm?apikey=&q=",
+  path: "/search/npm?q=",
   async run(req, res) {
     try {
-      const { apikey, q } = req.query;
-      if (!apikey || !global.apikey.includes(apikey)) {
-        return res.json({ status: false, error: 'Apikey invalid' });
-      }
+      const { q } = req.query;
       if (!q) {
         return res.json({ status: false, error: 'Query is required' });
       }

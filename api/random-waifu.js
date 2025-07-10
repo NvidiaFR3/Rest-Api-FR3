@@ -2,13 +2,8 @@ module.exports = {
   name: "Waifu",
   desc: "Random waifu beautiful",
   category: "Random",
-  path: "/random/waifu?apikey=",
+  path: "/random/waifu",
   async run(req, res) {
-    const { apikey } = req.query;
-    if (!apikey || !global.apikey.includes(apikey)) {
-      return res.json({ status: false, error: 'Apikey invalid' });
-    }
-
     try {
       const data = await fetchJson(`https://api.waifu.pics/sfw/waifu`);
       const image = await getBuffer(data.url);

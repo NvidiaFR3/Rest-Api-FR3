@@ -2,10 +2,9 @@ module.exports = {
   name: "To Hitam",
   desc: "Hitamkan foto orang",
   category: "Imagecreator",
-  path: "/imagecreator/tohitam?apikey=&url=",
+  path: "/imagecreator/tohitam?url=",
   async run(req, res) {
-    const { apikey, url } = req.query;
-    if (!apikey || !global.apikey.includes(apikey)) return res.json({ status: false, error: "Apikey invalid" });
+    const { url } = req.query;
     if (!url) return res.json({ status: false, error: "Url is required" });
     try {
       const ap = await fetchJson(`https://api.platform.web.id/hitam?imageUrl=${url}`)

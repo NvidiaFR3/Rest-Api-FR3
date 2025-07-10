@@ -4,13 +4,9 @@ module.exports = {
   name: "OCR",
   desc: "Ocr text in image",
   category: "Tools",
-  path: "/tools/ocr?apikey=&url=",
+  path: "/tools/ocr?url=",
   async run(req, res) {
-    const { apikey, url } = req.query;
-
-    if (!apikey || !global.apikey.includes(apikey)) {
-      return res.json({ status: false, error: 'Apikey invalid' });
-    }
+    const { url } = req.query;
 
     if (!url) {
       return res.json({ status: false, error: 'Url is required' });

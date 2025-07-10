@@ -41,12 +41,9 @@ module.exports = {
   name: "Tiktok Stalk",
   desc: "Stalking tiktok username",
   category: "Stalker",
-  path: "/stalk/tiktok?apikey=&username=",
+  path: "/stalk/tiktok?username=",
   async run(req, res) {
-    const { apikey, username } = req.query;
-
-    if (!apikey || !global.apikey.includes(apikey))
-      return res.json({ status: false, error: "Apikey invalid" });
+    const { username } = req.query;
 
     if (!username)
       return res.json({ status: false, error: "Username is required" });

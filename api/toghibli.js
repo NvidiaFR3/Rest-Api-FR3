@@ -2,7 +2,7 @@ module.exports = {
   name: "To Ghibli",
   desc: "Image to ghibli style",
   category: "Imagecreator",
-  path: "/imagecreator/toghibli?apikey=&url=",
+  path: "/imagecreator/toghibli?url=",
   async run(req, res) {
     const { apikey, url } = req.query;
     if (!apikey || !global.apikey.includes(apikey)) return res.json({ status: false, error: "Apikey invalid" });

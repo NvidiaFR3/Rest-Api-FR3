@@ -70,12 +70,9 @@ module.exports = {
   name: "Text To Speech",
   desc: "Convert text to sound",
   category: "Tools",
-  path: "/tools/text-to-speech?apikey=&text=",
+  path: "/tools/text-to-speech?text=",
   async run(req, res) {
-    const { apikey, text } = req.query;
-
-    if (!apikey || !global.apikey.includes(apikey))
-      return res.json({ status: false, error: 'Apikey invalid' });
+    const { text } = req.query;
 
     if (!text)
       return res.json({ status: false, error: 'Text is required' });

@@ -50,13 +50,9 @@ module.exports = {
   name: "Spotify",
   desc: "Spotify song downloader",
   category: "Downloader",
-  path: "/download/spotify?apikey=&url=",
+  path: "/download/spotify?url=",
   async run(req, res) {
-    const { apikey, url } = req.query;
-
-    if (!global.apikey.includes(apikey)) {
-      return res.json({ status: false, error: "Apikey invalid" });
-    }
+    const { url } = req.query;
 
     if (!url) {
       return res.json({ status: false, error: "Url is required" });

@@ -68,16 +68,13 @@ module.exports = {
   name: "llama",
   desc: "Ai llama models",
   category: "Openai",
-  path: "/ai/llama?apikey=&text=",
+  path: "/ai/llama?text=",
 
   async run(req, res) {
-    const { text, apikey } = req.query;
+    const { text } = req.query;
 
     if (!text)
       return res.json({ status: false, error: "Text is required" });
-
-    if (!apikey || !global.apikey?.includes(apikey))
-      return res.json({ status: false, error: "Invalid API key" });
       
 const yourQuestion = text
 const systemPrompt = "Sekarang kamu ada ai assisten model llama"

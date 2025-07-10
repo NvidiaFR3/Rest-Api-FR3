@@ -41,13 +41,9 @@ module.exports = {
   name: "Playstore Search",
   desc: "Search apk playstore",
   category: "Search",
-  path: "/search/playstore?apikey=&q=",
+  path: "/search/playstore?q=",
   async run(req, res) {
-    const { apikey, q } = req.query;
-
-    if (!apikey || !global.apikey.includes(apikey)) {
-      return res.json({ status: false, error: "Apikey invalid" });
-    }
+    const { q } = req.query;
 
     if (!q) {
       return res.json({ status: false, error: "Query is required" });

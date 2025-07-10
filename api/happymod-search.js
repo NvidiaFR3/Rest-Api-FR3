@@ -38,13 +38,9 @@ module.exports = {
   name: "Happymod Search",
   desc: "Search apk happymod",
   category: "Search",
-  path: "/search/happymod?apikey=&q=",
+  path: "/search/happymod?q=",
   async run(req, res) {
     const { apikey, q } = req.query;
-
-    if (!global.apikey.includes(apikey)) {
-      return res.json({ status: false, error: 'Apikey invalid' });
-    }
 
     if (!q) {
       return res.json({ status: false, error: 'Query is required' });

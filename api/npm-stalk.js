@@ -24,13 +24,9 @@ module.exports = {
   name: "Npm Stalk",
   desc: "Stalking npm package nodejs",
   category: "Stalker",
-  path: "/stalk/npm?apikey=&name=",
+  path: "/stalk/npm?name=",
   async run(req, res) {
-    const { apikey, name } = req.query;
-
-    if (!apikey || !global.apikey.includes(apikey)) {
-      return res.json({ status: false, error: "Apikey invalid" });
-    }
+    const { name } = req.query;
 
     if (!name) {
       return res.json({ status: false, error: "Name is required" });

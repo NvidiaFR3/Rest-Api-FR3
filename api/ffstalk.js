@@ -89,12 +89,9 @@ module.exports = {
   name: "FF Stalk",
   desc: "Stalking free fire account",
   category: "Stalker",
-  path: "/stalk/ff?apikey=&id=",
+  path: "/stalk/ff?id=",
   async run(req, res) {
-    const { apikey, id } = req.query;
-
-    if (!apikey || !global.apikey.includes(apikey))
-      return res.json({ status: false, error: "Apikey invalid" });
+    const { id } = req.query;
 
     if (!id)
       return res.json({ status: false, error: "Id is required" });

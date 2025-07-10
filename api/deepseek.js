@@ -68,17 +68,14 @@ module.exports = {
   name: "Deepseek",
   desc: "Ai deepseek models",
   category: "Openai",
-  path: "/ai/deepseek?apikey=&text=",
+  path: "/ai/deepseek?text=",
 
   async run(req, res) {
-    const { text, apikey } = req.query;
+    const { text } = req.query;
 
     if (!text)
       return res.json({ status: false, error: "Text is required" });
 
-    if (!apikey || !global.apikey?.includes(apikey))
-      return res.json({ status: false, error: "Invalid API key" });
-      
 const yourQuestion = text
 const systemPrompt = "Sekarang kamu ada ai assisten model deepseek-r1"
 const modelList = [

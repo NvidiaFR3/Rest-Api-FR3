@@ -111,12 +111,10 @@ module.exports = {
     name: "Ytdl (alternatif)",
     desc: "Youtube downloader",
     category: "Downloader",
-    path: "/download/ytdl?apikey=&url=",
+    path: "/download/ytdl?url=",
     async run(req, res) {
       try {
-        const { apikey, url } = req.query;
-        if (!apikey || !global.apikey.includes(apikey))
-          return res.json({ status: false, error: "Apikey invalid" });
+        const { url } = req.query;
         if (!url)
           return res.json({ status: false, error: "Url is required" });
 

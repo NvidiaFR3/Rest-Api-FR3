@@ -90,12 +90,9 @@ module.exports = [
     name: "Tiktok",
     desc: "Tiktok downloader",
     category: "Downloader",
-    path: "/download/tiktok?apikey=&url=",
+    path: "/download/tiktok?url=",
     async run(req, res) {
-      const { url, apikey } = req.query;
-      if (!apikey || !global.apikey.includes(apikey)) {
-        return res.json({ status: false, error: "Apikey invalid" });
-      }
+      const { url } = req.query;
       if (!url) {
         return res.json({ status: false, error: "Url is required" });
       }

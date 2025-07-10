@@ -9,7 +9,7 @@ module.exports = {
 
     const buffer = await getBuffer(`https://api.nekorinn.my.id/maker/brat-v2?text=${encodeURIComponent(text)}&mode=animated`);
     res.writeHead(200, {
-      'Content-Type': 'image',
+      'Content-Type': 'image/png',
       'Content-Length': buffer.length,
     });
     res.end(buffer);

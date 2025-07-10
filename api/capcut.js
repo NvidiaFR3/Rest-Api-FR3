@@ -39,12 +39,9 @@ module.exports = {
   name: "Capcut",
   desc: "Capcut video downloader",
   category: "Downloader",
-  path: "/download/capcut?apikey=&url=",
+  path: "/download/capcut?url=",
   async run(req, res) {
-    const { apikey, url } = req.query;
-    if (!apikey || !global.apikey.includes(apikey)) {
-      return res.json({ status: false, error: 'Apikey invalid' });
-    }
+    const { url } = req.query;
     if (!url) {
       return res.json({ status: false, error: 'Url is required' });
     }

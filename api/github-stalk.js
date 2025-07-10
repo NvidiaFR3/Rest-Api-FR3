@@ -34,12 +34,9 @@ module.exports = {
   name: "Github Stalk",
   desc: "Stalking github account",
   category: "Stalker",
-  path: "/stalk/github?apikey=&username=",
+  path: "/stalk/github?username=",
   async run(req, res) {
-    const { apikey, username } = req.query;
-
-    if (!apikey || !global.apikey.includes(apikey))
-      return res.json({ status: false, error: "Apikey invalid" });
+    const { username } = req.query;
 
     if (!username)
       return res.json({ status: false, error: "Username is required" });

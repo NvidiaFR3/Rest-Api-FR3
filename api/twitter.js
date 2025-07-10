@@ -4,12 +4,10 @@ module.exports = {
     name: "Twitter",
     desc: "Twitter Downloader",
     category: "Downloader",
-    path: "/download/twitter?apikey=&url=",
+    path: "/download/twitter?url=",
     async run(req, res) {
       try {
-        const { apikey, url } = req.query;
-        if (!apikey || !global.apikey.includes(apikey))
-          return res.json({ status: false, error: "Apikey invalid" });
+        const { url } = req.query;
         if (!url)
           return res.json({ status: false, error: "Url is required" });
 

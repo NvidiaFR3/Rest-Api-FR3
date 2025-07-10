@@ -4,13 +4,9 @@ module.exports = {
   name: "Youtube Search",
   desc: "Search video youtube",
   category: "Search",
-  path: "/search/youtube?apikey=&q=",
+  path: "/search/youtube?q=",
   async run(req, res) {
-    const { apikey, q } = req.query;
-
-    if (!global.apikey.includes(apikey)) {
-      return res.json({ status: false, error: "Apikey invalid" });
-    }
+    const { q } = req.query;
 
     if (!q) {
       return res.json({ status: false, error: "Query is required" });

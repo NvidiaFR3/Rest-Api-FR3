@@ -4,12 +4,10 @@ module.exports = {
     name: "Gdrive",
     desc: "Google drive downloader",
     category: "Downloader",
-    path: "/download/gdrive?apikey=&url=",
+    path: "/download/gdrive?url=",
     async run(req, res) {
       try {
-        const { apikey, url } = req.query;
-        if (!apikey || !global.apikey.includes(apikey))
-          return res.json({ status: false, error: "Apikey invalid" });
+        const { url } = req.query;
         if (!url)
           return res.json({ status: false, error: "Url is required" });
 
