@@ -39,7 +39,7 @@ module.exports = {
     name: "Sfile Search",
     desc: "Search sfile.mobi for file downloads",
     category: "Search",
-    path: "/search/sfile",
+    path: "/search/sfile?q=",
     async run(req, res) {
         const { q, page = 1 } = req.query;
         
