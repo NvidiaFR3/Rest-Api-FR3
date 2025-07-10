@@ -1022,6 +1022,13 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', async () => {
+let currentCategory = "All";
+
+document.getElementById("searchInput").addEventListener("input", function () {
+  const keyword = this.value.trim().toLowerCase();
+  renderApiCards(currentCategory, keyword);
+});
+
   const loadingScreen = document.getElementById('loading-screen');
   const container = document.querySelector('.container');
   const tabsContainer = document.getElementById("tabs");
@@ -1146,7 +1153,50 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // Function to render API cards
-  function renderApiCards(category) {
+  function renderApiCards(category, keyword = "") {
+  apiList.innerHTML = "";
+  const filteredApis = category === "All" ? Object.values(apis).flat() : apis[category] || [];
+
+  const result = filteredApis.filter(api =>
+    (api.name || '').toLowerCase().includes(keyword) ||
+    (api.desc || '').toLowerCase().includes(keyword) ||
+    (api.path || '').toLowerCase().includes(keyword)
+  );
+
+  if (result.length === 0) {
+    apiList.innerHTML = `<p style="text-align: center; color: var(--text-gray); margin-top: 2rem;">
+                          Tidak ditemukan endpoint yang cocok.
+                        </p>`;
+    return;
+  }
+
+  result.forEach((api, index) => {
+    const card = document.createElement("div");
+    card.className = "api-card";
+    card.style.animationDelay = `${index * 0.05}s`;
+
+    const method = 'GET';
+    const methodClass = `method-${method.toLowerCase()}`;
+
+    card.innerHTML = `
+      <div class="api-info">
+        <h3>
+          <span class="method-badge ${methodClass}">${method}</span> ${api.name || 'Untitled API'}
+        </h3>
+        <p>${api.desc || 'No description provided.'}</p>
+      </div>
+      <button class="play-button" 
+              data-endpoint="${api.path || ''}" 
+              data-name="${api.name || 'Untitled API'}" 
+              data-description="${api.desc || 'No description provided.'}" 
+              data-method="${method}" 
+              data-params='${JSON.stringify(extractParams(api.path) || [])}'> 
+        Try It <i class="fas fa-arrow-right"></i>
+      </button>
+    `;
+    apiList.appendChild(card);
+  });
+}
     apiList.innerHTML = "";
     const filteredApis = category === "All" ? Object.values(apis).flat() : apis[category] || [];
     
@@ -1209,6 +1259,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   function renderTabs() {
+  tabsContainer.innerHTML = '';
     tabsContainer.innerHTML = "";
     const categories = ["All", ...Object.keys(apis).filter(key => Array.isArray(apis[key]) && apis[key].length > 0)];
     
