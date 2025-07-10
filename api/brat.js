@@ -7,7 +7,7 @@ module.exports = {
     const { text } = req.query;
     if (!text) return res.json({ status: false, error: 'Missing text' });
 
-    const buffer = await getBuffer(`https://fastrestapis.fasturl.cloud/maker/brat/animated?text=${encodeURIComponent(text)}&mode=animated`);
+    const buffer = await getBuffer(`https://api.nekorinn.my.id/maker/brat-v2?text=${encodeURIComponent(text)}&mode=animated`);
     res.writeHead(200, {
       'Content-Type': 'image',
       'Content-Length': buffer.length,
