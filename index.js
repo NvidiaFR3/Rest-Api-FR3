@@ -61,11 +61,11 @@ global.totalreq = 0;
 
 // Settings
 const settings = {
-  creatorName: "X-Skycode",
-  whatsappLink: "https://wa.me/6283823097750",
+  creatorName: "FR3HOSTING",
+  whatsappLink: "https://wa.me/62882008771871",
   apiTitle: "Selfbot API's",
-  githubLink: "https://whatsapp.com/channel/0029Vb8cgMEH5JLqiOEdbH1t",
-  instagramLink: "https://whatsapp.com/channel/0029Vb8cgMEH5JLqiOEdbH1t"
+  githubLink: "https://NvidiaFR3",
+  instagramLink: "https://wa.me/62882008771871"
 };
 
 
