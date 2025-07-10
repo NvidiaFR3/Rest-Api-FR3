@@ -93,12 +93,10 @@ module.exports = [
     name: "Ytmp4",
     desc: "Download video youtube",
     category: "Downloader",
-    path: "/download/ytmp4?apikey=&url=",
+    path: "/download/ytmp4?url=",
     async run(req, res) {
       try {
-        const { apikey, url } = req.query;
-        if (!apikey || !global.apikey.includes(apikey))
-          return res.json({ status: false, error: "Apikey invalid" });
+        const { url } = req.query;
         if (!url)
           return res.json({ status: false, error: "Url is required" });
 
