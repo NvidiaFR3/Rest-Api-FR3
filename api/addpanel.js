@@ -5,6 +5,7 @@ module.exports = {
   desc: "Create Node.js users and servers directly in Pterodactyl",
   category: "Pterodactyl",
   path: "/pterodactyl/addpanel?domain=&plta=&username=&disk=&cpu=",
+
   async run(req, res) {
     const { domain, plta, username, disk, cpu } = req.query;
 
@@ -45,11 +46,15 @@ module.exports = {
         return res.json({ status: false, error: "Gagal membuat user", response: userData });
       }
 
-      // Ambil allocation dari lokasi 1
-      const getAlloc = await fetch(`${domain}/api/application/locations/1`, { headers });
-      const locData = await getAlloc.json();
+      // Ambil node dengan location_id = 1
+      const getNodes = await fetch(`${domain}/api/application/nodes`, { headers });
+      const nodesData = await getNodes.json();
 
-      const getAllocs = await fetch(`${domain}/api/application/nodes/${locData.relationships.nodes.data[0].attributes.id}/allocations`, { headers });
+      const targetNode = nodesData.data.find(n => n.attributes.location_id === 1);
+      if (!targetNode) return res.json({ status: false, error: "Node dengan lokasi 1 tidak ditemukan" });
+
+      // Ambil allocation dari node yang cocok
+      const getAllocs = await fetch(`${domain}/api/application/nodes/${targetNode.attributes.id}/allocations`, { headers });
       const allocData = await getAllocs.json();
 
       const allocation = allocData.data.find(a => !a.attributes.assigned);
