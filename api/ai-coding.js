@@ -3,7 +3,7 @@ const fetch = require("node-fetch");
 module.exports = {
   name: "Ai Code",
   desc: "AI specifically to help with coding",
-  category: "Tools",
+  category: "Openai",
   path: "/tools/aicoder?text=",
 
   async run(req, res) {
@@ -14,7 +14,7 @@ module.exports = {
     }
 
     try {
-      const apiUrl = `https://api.nekorinn.my.id/ai/opengpt?text=${encodeURIComponent(text)}`;
+      const apiUrl = `https://api.nekorinn.my.id/ai/opengpt?text=Kamu Sekarng Ai code yang selalu coding dan berbahasa indonesia. Jawab pertanyaan ini${encodeURIComponent(text)}`;
 
       const response = await fetch(apiUrl);
       const result = await response.json();
