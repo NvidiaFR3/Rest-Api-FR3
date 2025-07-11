@@ -5,7 +5,7 @@ module.exports = {
   desc: "Create Node.js users and servers directly in Pterodactyl",
   category: "Pterodactyl",
   path: "/pterodactyl/addpanel?domain=&plta=&username=&disk=&cpu=",
-
+  
   async run(req, res) {
     const { domain, plta, username, disk, cpu } = req.query;
 
@@ -26,7 +26,7 @@ module.exports = {
     };
 
     try {
-      // Buat user
+      // 1. Buat user
       const createUser = await fetch(`${domain}/api/application/users`, {
         method: "POST",
         headers,
@@ -46,23 +46,26 @@ module.exports = {
         return res.json({ status: false, error: "Gagal membuat user", response: userData });
       }
 
-      // Ambil node dengan location_id = 1
+      // 2. Ambil node dengan location_id = 1
       const getNodes = await fetch(`${domain}/api/application/nodes`, { headers });
       const nodesData = await getNodes.json();
 
       const targetNode = nodesData.data.find(n => n.attributes.location_id === 1);
       if (!targetNode) return res.json({ status: false, error: "Node dengan lokasi 1 tidak ditemukan" });
 
-      // Ambil allocation dari node yang cocok
+      // 3. Ambil allocations dari node itu
       const getAllocs = await fetch(`${domain}/api/application/nodes/${targetNode.attributes.id}/allocations`, { headers });
       const allocData = await getAllocs.json();
 
-      const allocation = allocData.data.find(a => !a.attributes.assigned);
-      if (!allocation) {
+      const availableAllocs = allocData.data.filter(a => !a.attributes.assigned);
+      if (!availableAllocs.length) {
         return res.json({ status: false, error: "Tidak ada allocation tersedia di lokasi 1" });
       }
 
-      // Buat server
+      // 4. Pilih satu allocation secara acak
+      const allocation = availableAllocs[Math.floor(Math.random() * availableAllocs.length)];
+
+      // 5. Buat server
       const serverBody = {
         name: username,
         user: userId,
@@ -71,7 +74,8 @@ module.exports = {
         docker_image: "ghcr.io/parkervcp/yolks:nodejs_18",
         startup: "npm start",
         environment: {
-          USER_UPLOAD: "1"
+          CMD_RUN: "npm start",
+          PORT: `${allocation.attributes.port}`
         },
         limits: {
           memory: 1024,
@@ -95,6 +99,15 @@ module.exports = {
         headers,
         body: JSON.stringify(serverBody)
       });
+
+      if (!createServer.ok) {
+        const errTxt = await createServer.text();
+        return res.status(createServer.status).json({
+          status: false,
+          error: `Gagal membuat server: ${createServer.statusText}`,
+          detail: errTxt
+        });
+      }
 
       const serverData = await createServer.json();
 
