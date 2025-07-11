@@ -1,84 +1,108 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Download Aplikasi FR3 API's</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Rendy Indra Peratama - Portfolio</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
   <style>
     body {
-      font-family: 'Poppins', sans-serif;
-      background: #f8f9fc;
-      margin: 0;
-      padding: 2rem;
-      text-align: center;
-      color: #1e293b;
-    }
-
-    h1 {
-      color: #3b82f6;
-      font-size: 1.8rem;
-      margin-bottom: 1rem;
-    }
-
-    img {
-      width: 180px;
-      border-radius: 10px;
-      margin: 1rem 0;
-    }
-
-    .btn-download {
-      background-color: #3b82f6;
-      color: white;
-      border: none;
-      padding: 0.75rem 2rem;
-      font-size: 1rem;
-      font-weight: 600;
-      border-radius: 10px;
-      cursor: pointer;
-      box-shadow: 0 4px 14px rgba(59, 130, 246, 0.3);
-      transition: 0.2s;
-    }
-
-    .btn-download:hover {
-      background-color: #2563eb;
-    }
-
-    .info-box {
-      background: white;
-      display: inline-block;
-      margin-top: 2rem;
-      text-align: left;
-      border-radius: 10px;
-      padding: 1rem 2rem;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    }
-
-    .info-box p {
-      margin: 0.5rem 0;
-      font-size: 1rem;
-    }
-
-    .info-box span {
-      font-weight: 600;
+      background: linear-gradient(to bottom right, #1e1b4b, #0f172a);
     }
   </style>
 </head>
-<body>
+<body class="text-white font-sans scroll-smooth">
 
-  <h1>Download Aplikasi<br>FR3 API's</h1>
-  <img src="https://img1.pixhost.to/images/7145/621074542_imgtmp.jpg" alt="Logo FR3 API's">
+  <!-- Hero Section -->
+  <section class="min-h-screen flex items-center justify-center text-center px-6" data-aos="fade-down">
+    <div>
+      <h1 class="text-5xl font-bold mb-4">Rendy Indra Peratama</h1>
+      <p class="text-lg text-gray-300">Frontend Developer & Script Developer</p>
+      <p class="text-sm text-gray-400 mt-2">Membangun Web & API yang cepat, modern, dan mudah diakses</p>
+    </div>
+  </section>
 
-  <br>
-  <a href="fr3.api.apk" download>
-    <button class="btn-download">Download Aplikasi APK</button>
-  </a>
+  <!-- Tentang Saya -->
+  <section class="p-6 max-w-3xl mx-auto" data-aos="fade-up">
+    <h2 class="text-3xl font-bold mb-4">Tentang Saya</h2>
+    <p class="text-gray-300 leading-relaxed">
+      Saya adalah seorang developer yang menggabungkan kreativitas desain dengan efisiensi kode. Fokus saya adalah membangun antarmuka yang bersih, API yang cepat, serta tools otomatisasi yang membantu orang lain bekerja lebih mudah. Saya juga membuat REST API Nvidia untuk pencarian informasi berbasis AI.
+    </p>
+  </section>
 
-  <div class="info-box">
-    <p><span>Nama Aplikasi</span> : FR3 API's</p>
-    <p><span>Versi</span> : 1</p>
-    <p><span>Format</span> : APK</p>
-  </div>
+  <!-- Skills -->
+  <section class="p-6 max-w-3xl mx-auto" data-aos="fade-up" data-aos-delay="100">
+    <h2 class="text-3xl font-bold mb-4">Keahlian</h2>
+    <div class="grid grid-cols-2 gap-4 text-gray-300">
+      <div>- HTML, CSS, JavaScript</div>
+      <div>- TailwindCSS, React</div>
+      <div>- Node.js, Express</div>
+      <div>- Web Scraping & REST API</div>
+      <div>- Automasi Bot (WA & Telegram)</div>
+      <div>- Git & GitHub</div>
+    </div>
+  </section>
 
+  <!-- Proyek Unggulan -->
+  <section class="p-6 max-w-5xl mx-auto" data-aos="fade-up" data-aos-delay="200">
+    <h2 class="text-3xl font-bold mb-6">Proyek Unggulan</h2>
+    <div class="grid gap-6 md:grid-cols-2">
+      <div class="bg-gray-800 p-4 rounded-xl shadow-lg">
+        <h3 class="text-xl font-bold">REST API Nvidia</h3>
+        <p class="text-gray-300">API berbasis AI untuk pencarian data otomatis dari berbagai sumber terpercaya.</p>
+      </div>
+      <div class="bg-gray-800 p-4 rounded-xl shadow-lg">
+        <h3 class="text-xl font-bold">Bot WhatsApp Anti-Spam</h3>
+        <p class="text-gray-300">Skrip bot yang mendeteksi spam dan auto block pengguna yang curang.</p>
+      </div>
+      <div class="bg-gray-800 p-4 rounded-xl shadow-lg">
+        <h3 class="text-xl font-bold">Dashboard Admin Portfolio</h3>
+        <p class="text-gray-300">Sistem untuk mengelola konten dan update data portfolio secara dinamis.</p>
+      </div>
+      <div class="bg-gray-800 p-4 rounded-xl shadow-lg">
+        <h3 class="text-xl font-bold">Web Scraper Berita Otomatis</h3>
+        <p class="text-gray-300">Mengambil berita dari berbagai situs besar seperti CNN, Antara, Tribun dengan fallback cache.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimoni -->
+  <section class="p-6 max-w-3xl mx-auto" data-aos="fade-up" data-aos-delay="300">
+    <h2 class="text-3xl font-bold mb-4">Apa Kata Mereka?</h2>
+    <blockquote class="bg-gray-800 p-4 rounded-xl shadow text-gray-300 italic">
+      "FR3 sangat cepat dan profesional. REST API buatannya membantu proyek saya jadi 2x lebih efisien."
+      <footer class="text-right mt-2 text-sm text-gray-500">— Klien Anonim</footer>
+    </blockquote>
+  </section>
+
+<!-- Tujuan Project -->
+<section class="p-6 max-w-3xl mx-auto" data-aos="fade-up" data-aos-delay="400">
+  <h2 class="text-3xl font-bold mb-4">Tujuan Project</h2>
+  <p class="text-gray-300 leading-relaxed">
+    REST API Nvidia saya bangun dengan satu tujuan utama: <strong>mempermudah orang dalam mencari dan mengakses informasi penting secara otomatis dan cepat</strong>. Dalam era banjir data seperti sekarang, pengguna membutuhkan alat yang bisa menyaring informasi relevan dari banyak sumber hanya dengan satu permintaan.
+  </p>
+  <p class="text-gray-300 mt-4 leading-relaxed">
+    API ini cocok untuk pengembang, pelajar, dan siapa pun yang ingin mengintegrasikan pencarian cerdas dalam aplikasi atau tools mereka, tanpa harus mengakses data secara manual. Saya terus mengembangkan API ini agar bisa belajar dan menjadi semakin pintar ke depannya.
+  </p>
+</section>
+
+  <!-- Footer -->
+  <footer class="p-6 text-center text-gray-500 text-sm">
+    © 2025 Rendy Indra Peratama — Dibuat dengan cinta dan TailwindCSS.
+    <div class="mt-2 space-x-4">
+      <a href="https://github.com/NvidiaFR3" class="hover:underline">GitHub</a>
+      <a href="https://wa.me/62882008771871" class="hover:underline">WhatsApp</a>
+      <a href="https://youtube.com/@fr3_hosting" class="hover:underline">YouTube</a>
+    </div>
+  </footer>
+
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script>
+    AOS.init({
+      duration: 1000,
+      once: true,
+    });
+  </script>
 </body>
 </html>
