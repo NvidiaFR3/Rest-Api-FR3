@@ -1,40 +1,25 @@
-const fs = require("fs");
-const path = require("path");
-
 module.exports = {
   name: "Status API",
-  desc: "Menampilkan status API seperti total fitur dan total request",
+  desc: "Menampilkan info status API dari sistem",
   category: "Tools",
   path: "/tools/statusapi",
 
   async run(req, res) {
     try {
-      const domain = req.query.domain || req.headers.host || "unknown.localhost";
+      const protocol = req.headers["x-forwarded-proto"] || "https";
+      const host = req.headers.host || "localhost";
+      const domain = `${protocol}://${host}`;
 
-      // Hitung jumlah plugin sebagai total fitur
-      const pluginDir = path.join(__dirname, ".."); // asumsi semua plugin di folder atas
-      const plugins = fs.readdirSync(pluginDir).filter(file => file.endsWith(".js"));
-
-      // Simulasi log request (bisa diganti pakai DB)
-      const logFile = path.join(pluginDir, "request-log.json");
-      let totalrequest = 1;
-
-      if (fs.existsSync(logFile)) {
-        const logs = JSON.parse(fs.readFileSync(logFile));
-        logs.totalrequest += 1;
-        fs.writeFileSync(logFile, JSON.stringify(logs, null, 2));
-        totalrequest = logs.totalrequest;
-      } else {
-        fs.writeFileSync(logFile, JSON.stringify({ totalrequest: 1 }, null, 2));
-      }
+      const totalfitur = require("../index")._totalRoutes || global.totalRoutes || 0;
+      const totalrequest = global.totalreq || 0;
 
       res.json({
         status: true,
-        creator: "Unknown",
+        creator: "FR3nvidia",
         result: {
           status: "Aktif",
           totalrequest: String(totalrequest),
-          totalfitur: String(plugins.length),
+          totalfitur: String(totalfitur),
           domain
         }
       });
