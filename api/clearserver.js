@@ -4,7 +4,7 @@ module.exports = {
   name: "Clear All Server Panel",
   desc: "Remove ALL servers from the panel",
   category: "Pterodactyl",
-  path: "/pterodactyl/clearallserver?domain=&plta=",
+  path: "/pterodactyl/clearserver?domain=&plta=",
 
   async run(req, res) {
     const { domain, plta } = req.query;
