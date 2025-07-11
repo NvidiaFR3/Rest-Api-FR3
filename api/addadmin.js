@@ -1,8 +1,8 @@
 const fetch = require("node-fetch");
 
 module.exports = {
-  name: "Add Pterodactyl Admin Panel",
-  desc: "Membuat user baru sebagai admin (tanpa server)",
+  name: "Add Admin Panel Pterodactyl",
+  desc: "Create a new user as admin",
   category: "Pterodactyl",
   path: "/pterodactyl/addadmin?domain=&plta=&username=",
   async run(req, res) {
