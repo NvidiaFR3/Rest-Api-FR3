@@ -1,8 +1,8 @@
 const fetch = require("node-fetch");
 
 module.exports = {
-  name: "Add Admin",
-  desc: "Create a new user as admin",
+  name: "Add Pterodactyl Admin Panel",
+  desc: "Membuat user baru sebagai admin (tanpa server)",
   category: "Pterodactyl",
   path: "/pterodactyl/addadmin?domain=&plta=&username=",
   async run(req, res) {
@@ -21,6 +21,8 @@ module.exports = {
         body: JSON.stringify({
           username,
           email: `${username}@fr3panel.local`,
+          first_name: "admin",
+          last_name: username,
           password: username,
           root_admin: true
         })
