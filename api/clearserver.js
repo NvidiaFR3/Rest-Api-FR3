@@ -5,7 +5,6 @@ module.exports = {
   desc: "Remove ALL servers from the panel",
   category: "Pterodactyl",
   path: "/pterodactyl/clearserver?domain=&plta=",
-
   async run(req, res) {
     const { domain, plta } = req.query;
 
@@ -19,9 +18,20 @@ module.exports = {
     };
 
     try {
-      const getServers = await fetch(`${domain}/api/application/servers?per_page=10000`, { headers });
-      const srvData = await getServers.json();
-      const servers = srvData.data || [];
+      let page = 1;
+      let servers = [];
+
+      while (true) {
+        const getServers = await fetch(`${domain}/api/application/servers?page=${page}&per_page=100`, { headers });
+        const data = await getServers.json();
+        servers = servers.concat(data.data || []);
+
+        if (!data.meta.pagination || data.meta.pagination.current_page >= data.meta.pagination.total_pages) {
+          break;
+        }
+
+        page++;
+      }
 
       let deleted = 0;
 
