@@ -4,58 +4,67 @@ module.exports = {
   name: "Delete Panel Pterodactyl",
   desc: "Deleting servers and users from Pterodactyl based on username",
   category: "Pterodactyl",
-  path: "/pterodactyl/delpanel?domain=&plta=&username=",
+  path: "/pterodactyl/delpanel?domain=&plta=&id=",
 
   async run(req, res) {
-    const { domain, plta, username } = req.query;
+    const { domain, plta, id } = req.query;
 
-    if (!domain || !plta || !username) {
-      return res.json({ status: false, error: "Wajib isi: domain, plta, username" });
+    if (!domain || !plta || !id) {
+      return res.json({
+        status: false,
+        error: "Wajib isi: domain, plta, dan id user"
+      });
     }
 
     const headers = {
       "Authorization": `Bearer ${plta}`,
-      "Accept": "Application/vnd.pterodactyl.v1+json"
+      "Accept": "Application/vnd.pterodactyl.v1+json",
+      "Content-Type": "application/json"
     };
 
     try {
-      // Cari user berdasarkan username
-      const getUsers = await fetch(`${domain}/api/application/users`, { headers });
-      const userList = await getUsers.json();
+      // Ambil semua server
+      const getServers = await fetch(`${domain}/api/application/users/${id}?include=servers`, { headers });
+      const userData = await getServers.json();
 
-      const user = userList.data.find(u => u.attributes.username === username);
-      if (!user) return res.json({ status: false, error: "User tidak ditemukan" });
-
-      const userId = user.attributes.id;
-
-      // Ambil semua server milik user
-      const getServers = await fetch(`${domain}/api/application/users/${userId}/servers`, { headers });
-      const serverList = await getServers.json();
+      const servers = userData.attributes.relationships?.servers?.data || [];
 
       // Hapus semua server milik user
-      const deletedServers = [];
-      for (const s of serverList.data) {
-        const serverId = s.attributes.id;
-        const delServer = await fetch(`${domain}/api/application/servers/${serverId}/force`, {
+      for (const srv of servers) {
+        const del = await fetch(`${domain}/api/application/servers/${srv.attributes.id}`, {
           method: "DELETE",
           headers
         });
-        deletedServers.push({ id: serverId, success: delServer.status === 204 });
+
+        if (!del.ok) {
+          const txt = await del.text();
+          return res.status(500).json({
+            status: false,
+            error: `Gagal hapus server ID ${srv.attributes.id}`,
+            detail: txt
+          });
+        }
       }
 
       // Hapus user
-      const delUser = await fetch(`${domain}/api/application/users/${userId}`, {
+      const deleteUser = await fetch(`${domain}/api/application/users/${id}`, {
         method: "DELETE",
         headers
       });
 
-      const userDeleted = delUser.status === 204;
+      if (!deleteUser.ok) {
+        const txt = await deleteUser.text();
+        return res.status(500).json({
+          status: false,
+          error: `Gagal hapus user ID ${id}`,
+          detail: txt
+        });
+      }
 
       res.json({
         status: true,
-        message: "User dan semua server telah dihapus",
-        deletedServers,
-        userDeleted
+        message: `User ID ${id} dan semua server miliknya berhasil dihapus.`,
+        total_servers_deleted: servers.length
       });
 
     } catch (err) {
