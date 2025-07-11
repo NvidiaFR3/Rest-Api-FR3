@@ -1,8 +1,8 @@
 const fetch = require("node-fetch");
 
 module.exports = {
-  name: "TebakHeroML",
-  desc: "Game tebak hero Mobile Legends (dengan audio voice)",
+  name: "Tebak Hero ML",
+  desc: "Game tebak hero Mobile Legends",
   category: "Games",
   path: "/games/tebakheroml",
 
