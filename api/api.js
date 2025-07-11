@@ -1,6 +1,6 @@
 module.exports = {
   name: "Status API",
-  desc: "Menampilkan info status API dari sistem",
+  desc: "Menampilkan info status API",
   category: "Tools",
   path: "/tools/statusapi",
 
@@ -10,12 +10,13 @@ module.exports = {
       const host = req.headers.host || "localhost";
       const domain = `${protocol}://${host}`;
 
-      const totalfitur = require("../index")._totalRoutes || global.totalRoutes || 0;
-      const totalrequest = global.totalreq || 0;
+      const indexData = require("../index");
+      const totalfitur = indexData._totalRoutes || global.totalRoutes || 0;
+      const totalrequest = indexData._totalreq || global.totalreq || 0;
 
       res.json({
         status: true,
-        creator: "FR3nvidia",
+        creator: "Unknown",
         result: {
           status: "Aktif",
           totalrequest: String(totalrequest),
@@ -26,7 +27,7 @@ module.exports = {
     } catch (err) {
       res.status(500).json({
         status: false,
-        creator: "FR3nvidia",
+        creator: "Unknown",
         error: err.message
       });
     }
