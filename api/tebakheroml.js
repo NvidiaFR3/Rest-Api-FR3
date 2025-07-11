@@ -1,7 +1,7 @@
 const fetch = require("node-fetch");
 
 module.exports = {
-  name: "Tebak Hero ML",
+  name: "TebakHeroML",
   desc: "Game tebak hero Mobile Legends (dengan audio voice)",
   category: "Games",
   path: "/games/tebakheroml",
@@ -11,7 +11,9 @@ module.exports = {
       const response = await fetch("https://api.siputzx.my.id/api/games/tebakheroml");
       const body = await response.json();
 
-      if (!body || body.status !== true || !body.data || !body.data.jawaban || !body.data.audio) {
+      const hero = body?.data;
+
+      if (!hero || !hero.name || !hero.audio) {
         return res.status(502).json({
           status: false,
           error: "Data dari API tidak valid atau tidak lengkap",
@@ -22,8 +24,8 @@ module.exports = {
       res.json({
         status: true,
         data: {
-          name: body.data.jawaban,
-          audio: body.data.audio
+          name: hero.name,
+          audio: hero.audio
         }
       });
 
