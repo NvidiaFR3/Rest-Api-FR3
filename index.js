@@ -20,6 +20,7 @@ app.use(cors());
 app.use('/', express.static(path.join(__dirname, '/')));
 app.use('/', express.static(path.join(__dirname, 'ui')));
 app.use('/api', express.static(path.join(__dirname, 'api')));
+app.use('/docs', express.static(path.join(__dirname, 'docs')));
 
 // Global Helpers
 global.getBuffer = async (url, options = {}) => {
