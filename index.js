@@ -22,7 +22,7 @@ app.use('/', express.static(path.join(__dirname, 'ui')));
 app.use('/api', express.static(path.join(__dirname, 'api')));
 app.use('/docs', express.static(path.join(__dirname, 'docs')));
 app.use('/ai', express.static(path.join(__dirname, 'ai')));
-app.use('/download', express.static(path.join(__dirname, 'download')));
+app.use('/portofolio', express.static(path.join(__dirname, 'portofolio')));
 
 // Global Helpers
 global.getBuffer = async (url, options = {}) => {
