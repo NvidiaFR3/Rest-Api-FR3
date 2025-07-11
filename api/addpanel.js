@@ -5,7 +5,6 @@ module.exports = {
   desc: "Create Node.js users and servers directly in Pterodactyl",
   category: "Pterodactyl",
   path: "/pterodactyl/addpanel?domain=&plta=&username=&disk=&cpu=",
-
   async run(req, res) {
     const { domain, plta, username, disk, cpu } = req.query;
 
@@ -16,7 +15,7 @@ module.exports = {
       });
     }
 
-    const email = `${username}@fr3.com`;
+    const email = `${username}@mail.com`;
     const password = username;
 
     const headers = {
@@ -30,7 +29,13 @@ module.exports = {
       const createUser = await fetch(`${domain}/api/application/users`, {
         method: "POST",
         headers,
-        body: JSON.stringify({ email, username, password })
+        body: JSON.stringify({
+          email,
+          username,
+          password,
+          first_name: "panel",
+          last_name: "pterodactyl"
+        })
       });
 
       const userData = await createUser.json();
@@ -40,7 +45,7 @@ module.exports = {
         return res.json({ status: false, error: "Gagal membuat user", response: userData });
       }
 
-      // Ambil allocation ID pertama dari lokasi 1
+      // Ambil allocation dari lokasi 1
       const getAlloc = await fetch(`${domain}/api/application/locations/1`, { headers });
       const locData = await getAlloc.json();
 
@@ -52,6 +57,7 @@ module.exports = {
         return res.json({ status: false, error: "Tidak ada allocation tersedia di lokasi 1" });
       }
 
+      // Buat server
       const serverBody = {
         name: username,
         user: userId,
