@@ -1,7 +1,7 @@
 const fetch = require("node-fetch");
 
 module.exports = {
-  name: "TebakJKT",
+  name: "Tebak JKT48",
   desc: "Game tebak member JKT48",
   category: "Games",
   path: "/games/tebakjkt",
