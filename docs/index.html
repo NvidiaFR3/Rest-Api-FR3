@@ -1009,7 +1009,11 @@
 
     <section class="content">
       <h2>Available Endpoints</h2> 
-      <div class="tabs" id="tabs"></div>
+      <div style="margin: 1.2rem 0;">
+  <input type="text" id="searchInput" placeholder="Search endpoints..." style="padding: 10px 15px; font-size: 0.95rem; width: 100%; max-width: 450px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--input-bg); color: var(--text-primary); box-shadow: var(--shadow-sm);" /> 
+     <div class="tabs" id="tabs"></div>
+</div>
+
 
       <div id="api-list" class="api-list"></div>
     </section>
@@ -1154,6 +1158,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     if (Object.keys(apis).length > 0) {
       renderTabs();
+    document.getElementById("searchInput").addEventListener("input", () => {
+      const activeTab = document.querySelector(".tab.active")?.textContent || "All";
+      renderApiCards(activeTab);
+    });
+
     } else {
       apiList.innerHTML = '<p style="text-align: center; color: var(--text-gray); margin-top: 2rem;">No API endpoints found. Please check your server configuration or the /endpoints response format.</p>';
     }
@@ -1185,7 +1194,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
-    filteredApis.forEach((api, index) => {
+    
+    const searchTerm = document.getElementById("searchInput")?.value?.toLowerCase() || "";
+    const visibleApis = filteredApis.filter(api =>
+      api.name?.toLowerCase().includes(searchTerm) ||
+      api.desc?.toLowerCase().includes(searchTerm)
+    );
+
+    visibleApis.forEach((api, index) => {
+
       const card = document.createElement("div"); 
       card.className = "api-card";
       card.style.animationDelay = `${index * 0.05}s`;
