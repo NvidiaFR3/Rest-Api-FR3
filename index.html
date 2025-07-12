@@ -519,6 +519,11 @@
       <h3>Jam (UTC+7)</h3>
       <p id="jam">00:00:00</p>
     </div>
+    <div class="api-card">
+  <i class="fas fa-battery-half"></i>
+  <h3>Status Baterai</h3>
+  <p id="battery">Mengambil data...</p>
+</div>
   </div>
 </section>
 
@@ -583,7 +588,32 @@
   </footer>
 
 <script>
-	
+  async function updateBatteryStatus() {
+    if (!('getBattery' in navigator)) {
+      document.getElementById("battery").innerText = "Browser tidak mendukung";
+      return;
+    }
+
+    try {
+      const battery = await navigator.getBattery();
+      const tampilkan = () => {
+        const persen = Math.round(battery.level * 100);
+        const charging = battery.charging ? "Mengisi daya" : "Tidak mengisi";
+        document.getElementById("battery").innerText = `${persen}% - ${charging}`;
+      };
+
+      tampilkan(); // Tampilkan pertama kali
+
+      // Update otomatis saat berubah
+      battery.addEventListener("levelchange", tampilkan);
+      battery.addEventListener("chargingchange", tampilkan);
+    } catch (e) {
+      document.getElementById("battery").innerText = "Gagal membaca baterai";
+    }
+  }
+
+  updateBatteryStatus();
+
   // Theme toggle
   const themeToggle = document.getElementById("themeToggle");
   const icon = document.getElementById("themeToggleIcon");
