@@ -4,7 +4,7 @@ module.exports = {
   name: "Text to QR",
   desc: "Mengubah teks menjadi QR Code",
   category: "Tools",
-  path: "/tools/texttoqr",
+  path: "/tools/texttoqr?text=",
   async run(req, res) {
     const { text } = req.query;
     if (!text) {
