@@ -3,8 +3,8 @@ const midtransClient = require('midtrans-client');
 module.exports = {
   name: "Create Payment With Midtrand",
   desc: "Deposit feature with Midtrans integration",
-  category: "Payment Gateway",
-  path: "/payment/cpayment?server=&username=&email=&phone=&serverKey=&clientKey=nominal=",
+  category: "Tools",
+  path: "/tools/cpayment?server=&username=&email=&phone=&serverKey=&clientKey=nominal=",
   async run(req, res) {
     const { server, nominal, username, serverKey, clientKey, email, phone } = req.query;
 
