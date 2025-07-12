@@ -3,7 +3,7 @@ const cheerio = require("cheerio");
 
 module.exports = {
   name: "Get Code HTML",
-  desc: "Mengambil source code HTML lengkap dengan CSS & JS eksternal",
+  desc: "Fetch full HTML source code with external CSS & JS",
   category: "Tools",
   path: "/tools/getcodefull?url=",
 
