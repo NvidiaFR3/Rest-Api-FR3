@@ -1,57 +1,52 @@
-const multer = require('multer');
-const Jimp = require('jimp');
-const QrCode = require('qrcode-reader');
-const path = require('path');
-const fs = require('fs');
-
-const upload = multer({ dest: 'tmp/' });
+const fetch = require("node-fetch");
+const FormData = require("form-data");
 
 module.exports = {
   name: "Read QR",
-  desc: "Membaca isi QR Code dari gambar",
+  desc: "Membaca QR code dari gambar URL",
   category: "Tools",
-  path: "/tools/readqr",
-  run: [
-    upload.single('image'),
-    async (req, res) => {
-      if (!req.file) {
+  path: "/tools/readqr?url=",
+  async run(req, res) {
+    const { url } = req.query;
+    if (!url) {
+      return res.status(400).json({
+        creator: "FR3HOSTING",
+        status: false,
+        error: "Parameter 'url' wajib diisi"
+      });
+    }
+
+    try {
+      const form = new FormData();
+      form.append("fileurl", url);
+
+      const response = await fetch("https://api.qrserver.com/v1/read-qr-code/", {
+        method: "POST",
+        body: form
+      });
+
+      const data = await response.json();
+      const hasil = data?.[0]?.symbol?.[0]?.data;
+
+      if (!hasil) {
         return res.status(400).json({
           creator: "FR3HOSTING",
           status: false,
-          error: "File gambar wajib diunggah menggunakan field 'image'"
+          error: "QR code tidak bisa dibaca atau tidak valid"
         });
       }
 
-      try {
-        const image = await Jimp.read(fs.readFileSync(req.file.path));
-        const qr = new QrCode();
-
-        qr.callback = (err, value) => {
-          fs.unlinkSync(req.file.path); // Hapus file setelah dibaca
-
-          if (err || !value) { 
-            return res.status(500).json({
-              creator: "FR3HOSTING",
-              status: false,
-              error: "Gagal membaca QR Code"
-            });
-          }
-
-          res.status(200).json({
-            creator: "FR3HOSTING",
-            status: true,
-            text: value.result
-          });
-        };
-
-        qr.decode(image.bitmap);
-      } catch (err) {
-        res.status(500).json({
-          creator: "FR3HOSTING",
-          status: false,
-          error: err.message
-        });
-      }
+      res.status(200).json({
+        creator: "FR3HOSTING",
+        status: true,
+        result: hasil
+      });
+    } catch (err) {
+      res.status(500).json({
+        creator: "FR3HOSTING",
+        status: false,
+        error: err.message
+      });
     }
-  ]
+  }
 };
