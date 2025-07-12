@@ -29,7 +29,7 @@ module.exports = {
         qr.callback = (err, value) => {
           fs.unlinkSync(req.file.path); // Hapus file setelah dibaca
 
-          if (err || !value) {
+          if (err || !value) { 
             return res.status(500).json({
               creator: "FR3HOSTING",
               status: false,
