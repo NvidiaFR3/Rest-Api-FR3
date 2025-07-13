@@ -5,7 +5,7 @@ const path = require("path");
 const { tmpdir } = require("os");
 
 module.exports = {
-  name: "Upload ZIP to GitHub",
+  name: "Upload GitHub",
   desc: "Automatically uploads files from a ZIP URL to a GitHub repository",
   category: "Tools",
   path: "/tools/githubupload?username=&repository=&token=&zipUrl=",
