@@ -1,10 +1,10 @@
 const midtransClient = require('midtrans-client');
 
 module.exports = {
-  name: "Create Payment With Midtrans",
+  name: "Create Payment",
   desc: "Buat transaksi pembayaran via Midtrans (tanpa server, email, dan phone)",
-  category: "Payment Gateway",
-  path: "/payment/createpayment?username=&nominal=&serverKey=&clientKey=",
+  category: "Tools",
+  path: "/tools/createpayment?username=&nominal=&serverKey=&clientKey=",
 
   async run(req, res) {
     const { username, nominal, serverKey, clientKey } = req.query;
