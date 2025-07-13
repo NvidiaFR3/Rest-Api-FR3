@@ -1,26 +1,32 @@
 const midtransClient = require('midtrans-client');
 
 module.exports = {
-  name: "Create Payment With Midtrand",
+  name: "Create Payment With Midtrans",
   desc: "Deposit feature with Midtrans integration",
   category: "Tools",
   path: "/tools/createpayment",
 
   async run(req, res) {
-    const { server, nominal, username, serverKey, clientKey, email, phone } = req.query;
+    const { server, nominal, username, serverKey, email, phone } = req.query;
 
-    if (!server || !nominal || !username || !serverKey || !clientKey || !email || !phone) {
+    if (!server || !nominal || !username || !serverKey || !email || !phone) {
       return res.status(400).json({
         status: false,
-        error: "Parameter server, nominal, username, serverKey, clientKey, email, dan phone wajib diisi.",
+        error: "Parameter server, nominal, username, serverKey, email, dan phone wajib diisi.",
+      });
+    }
+
+    if (isNaN(nominal)) {
+      return res.status(400).json({
+        status: false,
+        error: "Nominal harus berupa angka.",
       });
     }
 
     try {
       const snap = new midtransClient.Snap({
         isProduction: false,
-        serverKey: serverKey,
-        clientKey: clientKey,
+        serverKey: serverKey
       });
 
       const transaction = await snap.createTransaction({
@@ -41,7 +47,6 @@ module.exports = {
             name: `${server} Balance`,
           },
         ]
-        // callbacks: { finish: "https://api.nvidiabotz.xyz/thanks" } <-- ini sudah dihapus
       });
 
       return res.status(200).json({
