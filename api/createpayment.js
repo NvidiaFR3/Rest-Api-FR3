@@ -4,7 +4,7 @@ module.exports = {
   name: "Create Payment With Midtrand",
   desc: "Deposit feature with Midtrans integration",
   category: "Tools",
-  path: "/tools/cpayment?server=&username=&email=&phone=&serverKey=&clientKey=nominal=",
+  path: "/tools/createpayment",
 
   async run(req, res) {
     const { server, nominal, username, serverKey, clientKey, email, phone } = req.query;
