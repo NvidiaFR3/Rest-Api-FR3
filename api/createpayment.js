@@ -3,8 +3,9 @@ const midtransClient = require('midtrans-client');
 module.exports = {
   name: "Create Payment With Midtrand",
   desc: "Deposit feature with Midtrans integration",
-  category: "Tools",
+  category: "Payment Gateway",
   path: "/tools/cpayment?server=&username=&email=&phone=&serverKey=&clientKey=nominal=",
+
   async run(req, res) {
     const { server, nominal, username, serverKey, clientKey, email, phone } = req.query;
 
@@ -39,15 +40,13 @@ module.exports = {
             quantity: 1,
             name: `${server} Balance`,
           },
-        ],
-        callbacks: {
-          finish: "https://api.nvidiabotz.xyz/thanks", // opsional redirect
-        },
+        ]
+        // callbacks: { finish: "https://api.nvidiabotz.xyz/thanks" } <-- ini sudah dihapus
       });
 
       return res.status(200).json({
         status: true,
-        message: `Silakan lanjutkan pembayaran`,
+        message: "Silakan lanjutkan pembayaran",
         snapToken: transaction.token,
         redirect_url: transaction.redirect_url,
       });
