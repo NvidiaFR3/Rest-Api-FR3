@@ -1,18 +1,18 @@
 const midtransClient = require('midtrans-client');
 
 module.exports = {
-  name: "Create Payment With Midtrans",
-  desc: "Buat transaksi pembayaran via Midtrans (tanpa server, email, dan phone)",
-  category: "Payment Gateway",
-  path: "/payment/createpayment?username=&nominal=&serverKey=&clientKey=",
+  name: "Create Payment Midtrans",
+  desc: "Membuat pembayaran Midtrans menggunakan serverKey (tanpa email & phone)",
+  category: "PaymentGateway",
+  path: "/payment/createpayment?username=&nominal=&serverKey=",
 
   async run(req, res) {
-    const { username, nominal, serverKey, clientKey } = req.query;
+    const { username, nominal, serverKey } = req.query;
 
-    if (!username || !nominal || !serverKey || !clientKey) {
+    if (!username || !nominal || !serverKey) {
       return res.status(400).json({
         status: false,
-        error: "Wajib isi: username, nominal, serverKey, dan clientKey",
+        error: "Wajib isi: username, nominal, dan serverKey",
       });
     }
 
@@ -20,7 +20,6 @@ module.exports = {
       const snap = new midtransClient.Snap({
         isProduction: false,
         serverKey: serverKey,
-        clientKey: clientKey,
       });
 
       const transaction = await snap.createTransaction({
@@ -36,23 +35,23 @@ module.exports = {
             id: "DEPOSIT",
             price: parseInt(nominal),
             quantity: 1,
-            name: "FR3 Balance",
-          },
+            name: "Deposit Saldo",
+          }
         ],
       });
 
-      return res.status(200).json({
+      return res.json({
         status: true,
-        message: "Silakan lanjutkan pembayaran",
+        message: "Transaksi berhasil dibuat",
         snapToken: transaction.token,
-        redirect_url: transaction.redirect_url,
+        redirect_url: transaction.redirect_url
       });
 
     } catch (err) {
       return res.status(500).json({
         status: false,
-        error: err.message || "Gagal membuat transaksi",
+        error: err.message,
       });
     }
-  },
+  }
 };
