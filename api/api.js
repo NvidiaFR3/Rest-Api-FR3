@@ -1,26 +1,6 @@
 const fs = require('fs');
 const path = require('path');
 
-const filePath = path.join(__dirname, '..', 'runtime.json');
-
-function loadRuntimeData() {
-  if (!fs.existsSync(filePath)) {
-    fs.writeFileSync(filePath, JSON.stringify({ startTime: Date.now(), totalRequest: 0 }, null, 2));
-  }
-
-  try {
-    const data = JSON.parse(fs.readFileSync(filePath));
-    if (!data.startTime) data.startTime = Date.now();
-    return data;
-  } catch (err) {
-    return { startTime: Date.now(), totalRequest: 0 };
-  }
-}
-
-function saveRuntimeData(data) {
-  fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
-}
-
 module.exports = {
   name: "API Status",
   desc: "Menampilkan status API: runtime, total request, total endpoint & domain",
@@ -29,37 +9,63 @@ module.exports = {
 
   run(req, res) {
     const app = req.app;
+    const runtimeFile = path.join(__dirname, '..', 'runtime.json');
+
+    // Fungsi bantu: konversi uptime
+    const convertUptime = (ms) => {
+      const s = Math.floor(ms / 1000) % 60;
+      const m = Math.floor(ms / 60000) % 60;
+      const h = Math.floor(ms / 3600000) % 24;
+      const d = Math.floor(ms / 86400000);
+      return `${d}d ${h}h ${m}m ${s}s`;
+    };
+
+    // Load data dari runtime.json atau inisialisasi baru
+    let data = {
+      startTime: Date.now(),
+      totalRequest: 0
+    };
+
+    try {
+      if (fs.existsSync(runtimeFile)) {
+        data = JSON.parse(fs.readFileSync(runtimeFile));
+        if (!data.startTime) data.startTime = Date.now();
+        if (!data.totalRequest) data.totalRequest = 0;
+      }
+    } catch (err) {
+      console.error("❌ Gagal membaca runtime.json:", err);
+    }
+
+    // Update total request
+    data.totalRequest++;
+
+    // Simpan kembali ke file
+    try {
+      fs.writeFileSync(runtimeFile, JSON.stringify(data, null, 2));
+    } catch (err) {
+      console.error("❌ Gagal menyimpan runtime.json:", err);
+    }
+
+    // Ambil semua endpoint
     const endpoints = app._router.stack
       .filter(r => r.route && r.route.path)
       .map(r => r.route.path);
 
-    const runtimeData = loadRuntimeData();
-
-    // Update total request
-    runtimeData.totalRequest++;
-    saveRuntimeData(runtimeData);
-
-    const uptimeMs = Date.now() - runtimeData.startTime;
+    // Hitung uptime
+    const uptimeMs = Date.now() - data.startTime;
     const uptime = convertUptime(uptimeMs);
 
+    // Kirim response
     res.json({
       status: true,
       creator: "FR3HOSTING",
       result: {
         domain: req.headers.host,
-        total_request: runtimeData.totalRequest,
+        total_request: data.totalRequest,
         runtime: uptime,
         total_endpoint: endpoints.length,
-        endpoint_list: endpoints
+        endpoint_list: endpoints // Boleh dihapus kalau mau lebih clean
       }
     });
   }
 };
-
-function convertUptime(ms) {
-  const s = Math.floor(ms / 1000) % 60;
-  const m = Math.floor(ms / 60000) % 60;
-  const h = Math.floor(ms / 3600000) % 24;
-  const d = Math.floor(ms / 86400000);
-  return `${d}d ${h}h ${m}m ${s}s`;
-}
