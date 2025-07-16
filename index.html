@@ -602,7 +602,7 @@
         document.getElementById("battery").innerText = `${persen}% - ${charging}`;
       };
 
-      tampilkan(); // Tampilkan pertama kali
+      tampilkan();
 
       // Update otomatis saat berubah
       battery.addEventListener("levelchange", tampilkan);
