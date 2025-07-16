@@ -1,22 +1,45 @@
-let totalRequest = 0;
-const startTime = Date.now();
+const fs = require('fs');
+const path = require('path');
+
+const filePath = path.join(__dirname, '..', 'runtime.json');
+
+function loadRuntimeData() {
+  if (!fs.existsSync(filePath)) {
+    fs.writeFileSync(filePath, JSON.stringify({ startTime: Date.now(), totalRequest: 0 }, null, 2));
+  }
+
+  try {
+    const data = JSON.parse(fs.readFileSync(filePath));
+    if (!data.startTime) data.startTime = Date.now();
+    return data;
+  } catch (err) {
+    return { startTime: Date.now(), totalRequest: 0 };
+  }
+}
+
+function saveRuntimeData(data) {
+  fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+}
 
 module.exports = {
   name: "API Status",
   desc: "Menampilkan status API: runtime, total request, total endpoint & domain",
-  category: "Api",
+  category: "Tools",
   path: "/tools/statusapi",
 
   run(req, res) {
-    totalRequest++;
-
-    // Ambil jumlah endpoint dari Express router stack
     const app = req.app;
     const endpoints = app._router.stack
       .filter(r => r.route && r.route.path)
       .map(r => r.route.path);
 
-    const uptimeMs = Date.now() - startTime;
+    const runtimeData = loadRuntimeData();
+
+    // Update total request
+    runtimeData.totalRequest++;
+    saveRuntimeData(runtimeData);
+
+    const uptimeMs = Date.now() - runtimeData.startTime;
     const uptime = convertUptime(uptimeMs);
 
     res.json({
@@ -24,10 +47,10 @@ module.exports = {
       creator: "FR3HOSTING",
       result: {
         domain: req.headers.host,
-        total_request: totalRequest,
+        total_request: runtimeData.totalRequest,
         runtime: uptime,
         total_endpoint: endpoints.length,
-        endpoint_list: endpoints // bisa dihapus jika terlalu panjang
+        endpoint_list: endpoints
       }
     });
   }
