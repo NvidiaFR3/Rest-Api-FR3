@@ -1,5 +1,10 @@
-const fs = require('fs');
 const path = require('path');
+
+// Simpan data runtime di memory
+let runtimeData = {
+  startTime: Date.now(),
+  totalRequest: 0
+};
 
 module.exports = {
   name: "API Status",
@@ -9,7 +14,6 @@ module.exports = {
 
   run(req, res) {
     const app = req.app;
-    const runtimeFile = path.join(__dirname, '..', 'runtime.json');
 
     // Fungsi bantu: konversi uptime
     const convertUptime = (ms) => {
@@ -20,31 +24,8 @@ module.exports = {
       return `${d}d ${h}h ${m}m ${s}s`;
     };
 
-    // Load data dari runtime.json atau inisialisasi baru
-    let data = {
-      startTime: Date.now(),
-      totalRequest: 0
-    };
-
-    try {
-      if (fs.existsSync(runtimeFile)) {
-        data = JSON.parse(fs.readFileSync(runtimeFile));
-        if (!data.startTime) data.startTime = Date.now();
-        if (!data.totalRequest) data.totalRequest = 0;
-      }
-    } catch (err) {
-      console.error("❌ Gagal membaca runtime.json:", err);
-    }
-
     // Update total request
-    data.totalRequest++;
-
-    // Simpan kembali ke file
-    try {
-      fs.writeFileSync(runtimeFile, JSON.stringify(data, null, 2));
-    } catch (err) {
-      console.error("❌ Gagal menyimpan runtime.json:", err);
-    }
+    runtimeData.totalRequest++;
 
     // Ambil semua endpoint
     const endpoints = app._router.stack
@@ -52,7 +33,7 @@ module.exports = {
       .map(r => r.route.path);
 
     // Hitung uptime
-    const uptimeMs = Date.now() - data.startTime;
+    const uptimeMs = Date.now() - runtimeData.startTime;
     const uptime = convertUptime(uptimeMs);
 
     // Kirim response
@@ -61,7 +42,7 @@ module.exports = {
       creator: "FR3HOSTING",
       result: {
         domain: req.headers.host,
-        total_request: data.totalRequest,
+        total_request: runtimeData.totalRequest,
         runtime: uptime,
         total_endpoint: endpoints.length,
         endpoint_list: endpoints // Boleh dihapus kalau mau lebih clean
