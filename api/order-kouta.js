@@ -220,5 +220,75 @@ module.exports = [
         res.status(500).json({ status: false, error: error.message });
       }
     }
+  },
+  {
+  name: "Cek Saldo QRIS",
+  desc: "Cek sisa saldo QRIS pada akun OrderKuota",
+  category: "OrderKuota",
+  path: "/orderkuota/ceksaldoqris?username=&token=",
+  async run(req, res) {
+    const { username, token } = req.query;
+    if (!username) return res.json({ status: false, error: 'Missing username' });
+    if (!token) return res.json({ status: false, error: 'Missing token' });
+
+    try {
+      const ok = new OrderKuota(username, token);
+      // payload untuk mengambil data akun (biasanya berisi saldo)
+      const payload = new URLSearchParams({
+        auth_token: token,
+        auth_username: username,
+        'requests[account]': '',
+        app_version_name: OrderKuota.APP_VERSION_NAME,
+        app_version_code: OrderKuota.APP_VERSION_CODE,
+        app_reg_id: OrderKuota.APP_REG_ID,
+      });
+
+      const resp = await ok.request('POST', `${OrderKuota.API_URL}/get`, payload);
+      // contoh struktur balikan: resp.account.qris_balance atau resp.results.qris_balance
+      const saldoQris = resp?.account?.qris_balance ?? resp?.results?.qris_balance ?? null;
+
+      if (saldoQris !== null) {
+        res.json({ status: true, saldoQris });
+      } else {
+        res.json({ status: false, error: 'Saldo QRIS tidak ditemukan' });
+      }
+    } catch (err) {
+      res.status(500).json({ status: false, error: err.message });
+    }
+  },
+  {
+  name: "Cek Saldo Akun",
+  desc: "Cek saldo utama / dompet pada akun OrderKuota",
+  category: "OrderKuota",
+  path: "/orderkuota/ceksaldoakun?username=&token=",
+  async run(req, res) {
+    const { username, token } = req.query;
+    if (!username) return res.json({ status: false, error: 'Missing username' });
+    if (!token) return res.json({ status: false, error: 'Missing token' });
+
+    try {
+      const ok = new OrderKuota(username, token);
+      const payload = new URLSearchParams({
+        auth_token: token,
+        auth_username: username,
+        'requests[account]': '',
+        app_version_name: OrderKuota.APP_VERSION_NAME,
+        app_version_code: OrderKuota.APP_VERSION_CODE,
+        app_reg_id: OrderKuota.APP_REG_ID,
+      });
+
+      const resp = await ok.request('POST', `${OrderKuota.API_URL}/get`, payload);
+      // contoh struktur balikan: resp.account.balance atau resp.results.balance
+      const saldoAkun = resp?.account?.balance ?? resp?.results?.balance ?? null;
+
+      if (saldoAkun !== null) {
+        res.json({ status: true, saldoAkun });
+      } else {
+        res.json({ status: false, error: 'Saldo akun tidak ditemukan' });
+      }
+    } catch (err) {
+      res.status(500).json({ status: false, error: err.message });
+    }
+  }
   }
 ];
