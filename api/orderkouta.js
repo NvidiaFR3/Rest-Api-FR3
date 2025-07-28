@@ -74,7 +74,7 @@ module.exports = [
     name: 'Cek Saldo Akun',
     desc: 'Cek saldo utama/dompet akun OrderKuota',
     category: 'Orderkuota',
-    path: '/orderkuota/ceksaldoakun',
+    path: '/orderkuota/ceksaldoakun?username=&token=',
     async run(req, res) {
       const { username, token } = req.query;
       if (!username || !token)
@@ -107,7 +107,7 @@ module.exports = [
     name: 'Cek Saldo QRIS',
     desc: 'Cek saldo QRIS pada akun OrderKuota',
     category: 'Orderkuota',
-    path: '/orderkuota/ceksaldoqris',
+    path: '/orderkuota/ceksaldoqris?username=&token=',
     async run(req, res) {
       const { username, token } = req.query;
       if (!username || !token)
