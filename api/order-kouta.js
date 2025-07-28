@@ -227,7 +227,7 @@ module.exports = [
   {
     name: "Cek Saldo QRIS",
     desc: "Cek sisa saldo QRIS pada akun OrderKuota",
-    category: "OrderKuota",
+    category: "Orderkuota",
     path: "/orderkuota/ceksaldoqris?username=&token=",
     async run(req, res) {
       const { username, token } = req.query;
@@ -261,7 +261,7 @@ module.exports = [
   {
     name: "Cek Saldo Akun",
     desc: "Cek saldo utama / dompet pada akun OrderKuota",
-    category: "OrderKuota",
+    category: "Orderkuota",
     path: "/orderkuota/ceksaldoakun?username=&token=",
     async run(req, res) {
       const { username, token } = req.query;
