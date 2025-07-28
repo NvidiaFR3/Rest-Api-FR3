@@ -289,19 +289,17 @@ module.exports = [
 
       const resp = await ok.request('POST', `${OrderKuota.API_URL}/get`, payload);
 
-      if (!resp || resp.success !== true) {
-        return res.json({ creator: "FR3HOSTING", status: false, error: 'Gagal mendapatkan data dari API', detail: resp });
-      }
+      let saldoAkun = null;
 
-      const saldoAkun = resp?.results?.account?.balance
-                      ?? resp?.account?.balance
-                      ?? resp?.data?.account?.balance
-                      ?? null;
+      // Cek di berbagai struktur
+      if (resp?.result?.balance) saldoAkun = resp.result.balance;
+      else if (resp?.account?.balance) saldoAkun = resp.account.balance;
+      else if (resp?.results?.account?.balance) saldoAkun = resp.results.account.balance;
 
       if (saldoAkun !== null) {
         res.json({ creator: "FR3HOSTING", status: true, saldoAkun });
       } else {
-        res.json({ creator: "FR3HOSTING", status: false, error: 'Saldo akun tidak ditemukan', detail: resp });
+        res.json({ creator: "FR3HOSTING", status: false, error: 'Saldo akun tidak ditemukan', debug: resp });
       }
     } catch (err) {
       res.status(500).json({ creator: "FR3HOSTING", status: false, error: err.message });
