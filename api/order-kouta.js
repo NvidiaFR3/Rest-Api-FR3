@@ -290,5 +290,4 @@ module.exports = [
       res.status(500).json({ status: false, error: err.message });
     }
   }
-  }
 ];
