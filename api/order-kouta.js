@@ -225,71 +225,81 @@ module.exports = [
     }
   },
   {
-    name: "Cek Saldo QRIS",
-    desc: "Cek sisa saldo QRIS pada akun OrderKuota",
-    category: "Orderkuota",
-    path: "/orderkuota/ceksaldoqris?username=&token=",
-    async run(req, res) {
-      const { username, token } = req.query;
-      if (!username) return res.json({ status: false, error: 'Missing username' });
-      if (!token) return res.json({ status: false, error: 'Missing token' });
+  name: "Cek Saldo QRIS",
+  desc: "Cek sisa saldo QRIS pada akun OrderKuota",
+  category: "Orderkuota",
+  path: "/orderkuota/ceksaldoqris?username=&token=",
+  async run(req, res) {
+    const { username, token } = req.query;
+    if (!username) return res.json({ status: false, error: 'Missing username' });
+    if (!token) return res.json({ status: false, error: 'Missing token' });
 
-      try {
-        const ok = new OrderKuota(username, token);
-        const payload = new URLSearchParams({
-          auth_token: token,
-          auth_username: username,
-          'requests[account]': '',
-          app_version_name: OrderKuota.APP_VERSION_NAME,
-          app_version_code: OrderKuota.APP_VERSION_CODE,
-          app_reg_id: OrderKuota.APP_REG_ID,
-        });
+    try {
+      const ok = new OrderKuota(username, token);
+      const payload = new URLSearchParams({
+        auth_token: token,
+        auth_username: username,
+        'requests[account]': '',
+        app_version_name: OrderKuota.APP_VERSION_NAME,
+        app_version_code: OrderKuota.APP_VERSION_CODE,
+        app_reg_id: OrderKuota.APP_REG_ID,
+      });
 
-        const resp = await ok.request('POST', `${OrderKuota.API_URL}/get`, payload);
-        const saldoQris = resp?.account?.qris_balance ?? resp?.results?.qris_balance ?? null;
+      const resp = await ok.request('POST', `${OrderKuota.API_URL}/get`, payload);
 
-        if (saldoQris !== null) {
-          res.json({ status: true, saldoQris });
-        } else {
-          res.json({ status: false, error: 'Saldo QRIS tidak ditemukan' });
-        }
-      } catch (err) {
-        res.status(500).json({ status: false, error: err.message });
+      if (!resp || resp.status !== true) {
+        return res.json({ status: false, error: 'Gagal mendapatkan data dari API', detail: resp });
       }
-    }
-  },
-  {
-    name: "Cek Saldo Akun",
-    desc: "Cek saldo utama / dompet pada akun OrderKuota",
-    category: "Orderkuota",
-    path: "/orderkuota/ceksaldoakun?username=&token=",
-    async run(req, res) {
-      const { username, token } = req.query;
-      if (!username) return res.json({ status: false, error: 'Missing username' });
-      if (!token) return res.json({ status: false, error: 'Missing token' });
 
-      try {
-        const ok = new OrderKuota(username, token);
-        const payload = new URLSearchParams({
-          auth_token: token,
-          auth_username: username,
-          'requests[account]': '',
-          app_version_name: OrderKuota.APP_VERSION_NAME,
-          app_version_code: OrderKuota.APP_VERSION_CODE,
-          app_reg_id: OrderKuota.APP_REG_ID,
-        });
+      const saldoQris = resp?.results?.account?.qris_balance ?? null;
 
-        const resp = await ok.request('POST', `${OrderKuota.API_URL}/get`, payload);
-        const saldoAkun = resp?.account?.balance ?? resp?.results?.balance ?? null;
-
-        if (saldoAkun !== null) {
-          res.json({ status: true, saldoAkun });
-        } else {
-          res.json({ status: false, error: 'Saldo akun tidak ditemukan' });
-        }
-      } catch (err) {
-        res.status(500).json({ status: false, error: err.message });
+      if (saldoQris !== null) {
+        res.json({ status: true, saldoQris });
+      } else {
+        res.json({ status: false, error: 'Saldo QRIS tidak ditemukan', detail: resp });
       }
+    } catch (err) {
+      res.status(500).json({ status: false, error: err.message });
     }
   }
+},
+{
+  name: "Cek Saldo Akun",
+  desc: "Cek saldo utama / dompet pada akun OrderKuota",
+  category: "Orderkuota",
+  path: "/orderkuota/ceksaldoakun?username=&token=",
+  async run(req, res) {
+    const { username, token } = req.query;
+    if (!username) return res.json({ status: false, error: 'Missing username' });
+    if (!token) return res.json({ status: false, error: 'Missing token' });
+
+    try {
+      const ok = new OrderKuota(username, token);
+      const payload = new URLSearchParams({
+        auth_token: token,
+        auth_username: username,
+        'requests[account]': '',
+        app_version_name: OrderKuota.APP_VERSION_NAME,
+        app_version_code: OrderKuota.APP_VERSION_CODE,
+        app_reg_id: OrderKuota.APP_REG_ID,
+      });
+
+      const resp = await ok.request('POST', `${OrderKuota.API_URL}/get`, payload);
+
+      if (!resp || resp.status !== true) {
+        return res.json({ status: false, error: 'Gagal mendapatkan data dari API', detail: resp });
+      }
+
+      const saldoAkun = resp?.results?.account?.balance ?? null;
+
+      if (saldoAkun !== null) {
+        res.json({ status: true, saldoAkun });
+      } else {
+        res.json({ status: false, error: 'Saldo akun tidak ditemukan', detail: resp });
+      }
+    } catch (err) {
+      res.status(500).json({ status: false, error: err.message });
+    }
+  }
+}
 ];
