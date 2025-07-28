@@ -291,16 +291,37 @@ module.exports = [
 
       let saldoAkun = null;
 
-      // Cek di berbagai struktur
+      // Cek kemungkinan struktur response
       if (resp?.result?.balance) saldoAkun = resp.result.balance;
       else if (resp?.account?.balance) saldoAkun = resp.account.balance;
       else if (resp?.results?.account?.balance) saldoAkun = resp.results.account.balance;
 
       if (saldoAkun !== null) {
-        res.json({ creator: "FR3HOSTING", status: true, saldoAkun });
-      } else {
-        res.json({ creator: "FR3HOSTING", status: false, error: 'Saldo akun tidak ditemukan', debug: resp });
+        return res.json({ creator: "FR3HOSTING", status: true, saldoAkun, source: "API /get" });
       }
+
+      // 🔄 Fallback: coba pakai API login token (kalau ada saldo di sana)
+      const fallbackPayload = new URLSearchParams({
+        username,
+        password: token, // Karena OTP/token dipakai seperti password di API
+        app_reg_id: OrderKuota.APP_REG_ID,
+        app_version_code: OrderKuota.APP_VERSION_CODE,
+        app_version_name: OrderKuota.APP_VERSION_NAME,
+      });
+
+      const fallbackResp = await ok.request('POST', `${OrderKuota.API_URL}/login`, fallbackPayload);
+
+      if (fallbackResp?.results?.balance) {
+        return res.json({ creator: "FR3HOSTING", status: true, saldoAkun: fallbackResp.results.balance, source: "Fallback /login" });
+      }
+
+      res.json({
+        creator: "FR3HOSTING",
+        status: false,
+        error: "Saldo akun tidak ditemukan di API /get maupun fallback login",
+        debug: resp
+      });
+
     } catch (err) {
       res.status(500).json({ creator: "FR3HOSTING", status: false, error: err.message });
     }
