@@ -247,19 +247,22 @@ module.exports = [
 
       const resp = await ok.request('POST', `${OrderKuota.API_URL}/get`, payload);
 
-      if (!resp || resp.status !== true) {
-        return res.json({ status: false, error: 'Gagal mendapatkan data dari API', detail: resp });
+      if (!resp || resp.success !== true) {
+        return res.json({ creator: "FR3HOSTING", status: false, error: 'Gagal mendapatkan data dari API', detail: resp });
       }
 
-      const saldoQris = resp?.results?.account?.qris_balance ?? null;
+      const saldoQris = resp?.results?.account?.qris_balance 
+                      ?? resp?.account?.qris_balance
+                      ?? resp?.data?.account?.qris_balance
+                      ?? null;
 
       if (saldoQris !== null) {
-        res.json({ status: true, saldoQris });
+        res.json({ creator: "FR3HOSTING", status: true, saldoQris });
       } else {
-        res.json({ status: false, error: 'Saldo QRIS tidak ditemukan', detail: resp });
+        res.json({ creator: "FR3HOSTING", status: false, error: 'Saldo QRIS tidak ditemukan', detail: resp });
       }
     } catch (err) {
-      res.status(500).json({ status: false, error: err.message });
+      res.status(500).json({ creator: "FR3HOSTING", status: false, error: err.message });
     }
   }
 },
@@ -286,19 +289,22 @@ module.exports = [
 
       const resp = await ok.request('POST', `${OrderKuota.API_URL}/get`, payload);
 
-      if (!resp || resp.status !== true) {
-        return res.json({ status: false, error: 'Gagal mendapatkan data dari API', detail: resp });
+      if (!resp || resp.success !== true) {
+        return res.json({ creator: "FR3HOSTING", status: false, error: 'Gagal mendapatkan data dari API', detail: resp });
       }
 
-      const saldoAkun = resp?.results?.account?.balance ?? null;
+      const saldoAkun = resp?.results?.account?.balance
+                      ?? resp?.account?.balance
+                      ?? resp?.data?.account?.balance
+                      ?? null;
 
       if (saldoAkun !== null) {
-        res.json({ status: true, saldoAkun });
+        res.json({ creator: "FR3HOSTING", status: true, saldoAkun });
       } else {
-        res.json({ status: false, error: 'Saldo akun tidak ditemukan', detail: resp });
+        res.json({ creator: "FR3HOSTING", status: false, error: 'Saldo akun tidak ditemukan', detail: resp });
       }
     } catch (err) {
-      res.status(500).json({ status: false, error: err.message });
+      res.status(500).json({ creator: "FR3HOSTING", status: false, error: err.message });
     }
   }
 }
