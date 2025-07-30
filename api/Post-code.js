@@ -1,8 +1,10 @@
+const nodeHtmlToImage = require('node-html-to-image');
+
 module.exports = {
-  name: "Post Code",
-  desc: "Tampilkan kode dengan style mirip terminal",
+  name: "Post Code Image",
+  desc: "Render kode menjadi gambar seperti UI terminal",
   category: "Tools",
-  path: "/tools/postcode?title=&code=",
+  path: "/tools/postcodeimg?title=&code=",
 
   async run(req, res) {
     const { title, code } = req.query;
@@ -12,59 +14,61 @@ module.exports = {
 
     const html = `
     <!DOCTYPE html>
-    <html lang="en">
+    <html>
     <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>${title}</title>
       <style>
         body {
           background: #1e1e1e;
-          color: #f8f8f2;
           font-family: 'Fira Code', monospace;
+          margin: 0; padding: 0;
           display: flex;
           justify-content: center;
           align-items: center;
           height: 100vh;
-          margin: 0;
         }
-        .code-box {
+        .window {
           background: #2d2d2d;
-          border-radius: 8px;
-          padding: 20px;
-          width: 90%;
-          max-width: 800px;
-          box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+          border-radius: 12px;
+          overflow: hidden;
+          box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+          width: 700px;
         }
         .title-bar {
           background: #333;
-          padding: 8px 16px;
+          color: #f8f8f2;
+          padding: 10px 16px;
           font-size: 14px;
-          color: #eee;
-          border-radius: 8px 8px 0 0;
         }
         pre {
-          margin: 0;
-          padding: 16px;
-          overflow-x: auto;
           color: #f8f8f2;
-          font-size: 14px;
+          padding: 20px;
+          font-size: 16px;
+          white-space: pre-wrap;
         }
-        /* Highlight warna */
         .keyword { color: #ff79c6; }
         .string { color: #f1fa8c; }
         .number { color: #bd93f9; }
       </style>
     </head>
     <body>
-      <div class="code-box">
+      <div class="window">
         <div class="title-bar">${title}</div>
         <pre><code>${code.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</code></pre>
       </div>
     </body>
     </html>`;
 
-    res.setHeader("Content-Type", "text/html");
-    res.send(html);
+    const imageBuffer = await nodeHtmlToImage({
+      html: html,
+      quality: 100,
+      type: 'png',
+      encoding: 'binary'
+    });
+
+    res.writeHead(200, {
+      'Content-Type': 'image/png',
+      'Content-Length': imageBuffer.length
+    });
+    res.end(imageBuffer);
   }
 };
