@@ -1,11 +1,8 @@
-const nodeHtmlToImage = require('node-html-to-image');
-
 module.exports = {
   name: "Post Code Image",
   desc: "Render kode menjadi gambar seperti UI terminal",
   category: "Tools",
   path: "/tools/postcodeimg?title=&code=",
-
   async run(req, res) {
     const { title, code } = req.query;
     if (!title || !code) {
