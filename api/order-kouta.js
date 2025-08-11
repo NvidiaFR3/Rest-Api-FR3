@@ -155,7 +155,7 @@ module.exports = [
   {
     name: "Get OTP",
     desc: "Get OTP Orderkuota",
-    category: "Orderkuota",
+    category: "PaymentGateway",
     path: "/orderkuota/getotp?username=&password=",
     async run(req, res) {
       const { username, password } = req.query;
@@ -173,7 +173,7 @@ module.exports = [
   {
     name: "Get Token",
     desc: "Get Token Orderkuota",
-    category: "Orderkuota",
+    category: "PaymentGateway",
     path: "/orderkuota/gettoken?username=&otp=",
     async run(req, res) {
       const { username, otp } = req.query;
@@ -191,7 +191,7 @@ module.exports = [
   {
     name: "Cek Mutasi QRIS",
     desc: "Cek Mutasi Qris Orderkuota",
-    category: "Orderkuota",
+    category: "PaymentGateway",
     path: "/orderkuota/mutasiqr?username=&token=",
     async run(req, res) {
       const { username, token } = req.query;
@@ -210,7 +210,7 @@ module.exports = [
   {
     name: "Create QRIS Payment",
     desc: "Generate QR Code Payment",
-    category: "Orderkuota",
+    category: "PaymentGateway",
     path: "/orderkuota/createpayment?amount=&codeqr=",
     async run(req, res) {
       const { amount, codeqr } = req.query;
