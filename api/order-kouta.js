@@ -71,6 +71,18 @@ class OrderKuota {
     return await this.request('POST', `${OrderKuota.API_URL}/get`, payload);
   }
 
+  async getBalance() {
+    const payload = new URLSearchParams({
+      auth_token: this.authToken,
+      auth_username: this.username,
+      'requests[0]': 'account',
+      app_version_name: OrderKuota.APP_VERSION_NAME,
+      app_version_code: OrderKuota.APP_VERSION_CODE,
+      app_reg_id: OrderKuota.APP_REG_ID,
+    });
+    return await this.request('POST', `${OrderKuota.API_URL}/get`, payload);
+  }
+
   buildHeaders() {
     return {
       'Host': OrderKuota.HOST,
@@ -190,44 +202,43 @@ module.exports = [
     }
   },
   {
-  name: "Withdraw QRIS Balance to User Balance",
-  desc: "Cairkan saldo QRIS ke saldo akun user",
-  category: "PaymentGateway",
-  path: "/orderkuota/widrawqris?username=&token=&amount=",
-  async run(req, res) {
-    const { username, token, amount } = req.query;
-    if (!username) return res.json({ status: false, error: 'Missing username' });
-    if (!token) return res.json({ status: false, error: 'Missing token' });
-    if (!amount) return res.json({ status: false, error: 'Missing amount' });
+    name: "Withdraw QRIS Balance to User Balance",
+    desc: "Cairkan saldo QRIS ke saldo akun user",
+    category: "PaymentGateway",
+    path: "/orderkuota/withdrawqris?username=&token=&amount=",
+    async run(req, res) {
+      const { username, token, amount } = req.query;
+      if (!username) return res.json({ status: false, error: 'Missing username' });
+      if (!token) return res.json({ status: false, error: 'Missing token' });
+      if (!amount) return res.json({ status: false, error: 'Missing amount' });
 
-    try {
-      const ok = new OrderKuota(username, token);
-      let balance = await ok.getBalance();
+      try {
+        const ok = new OrderKuota(username, token);
+        let balance = await ok.getBalance();
 
-      let saldoQris = parseInt(balance.saldo_qris);
-      let saldoUser = parseInt(balance.saldo); // saldo biasa
+        let saldoQris = parseInt(balance.account.saldo_qris);
+        let saldoUser = parseInt(balance.account.saldo);
 
-      if (saldoQris < amount) {
-        return res.json({ status: false, error: 'Saldo QRIS tidak mencukupi' });
+        if (saldoQris < amount) {
+          return res.json({ status: false, error: 'Saldo QRIS tidak mencukupi' });
+        }
+
+        saldoQris -= parseInt(amount);
+        saldoUser += parseInt(amount);
+
+        // ⚠️ Di sini kamu harus update saldo ke DB
+        // await db.updateUserBalance(username, saldoUser, saldoQris);
+
+        res.json({
+          status: true,
+          message: `Berhasil withdraw saldo QRIS ke saldo akun`,
+          amount: parseInt(amount),
+          saldo_qris: saldoQris,
+          saldo_user: saldoUser
+        });
+      } catch (err) {
+        res.status(500).json({ status: false, error: err.message });
       }
-
-      // kurangi saldo qris, tambahkan ke saldo user
-      saldoQris -= parseInt(amount);
-      saldoUser += parseInt(amount);
-
-      // ⚠️ Di sini kamu harus update saldo ke DB
-      // misalnya: await db.updateUserBalance(username, saldoUser, saldoQris);
-
-      res.json({
-        status: true,
-        message: `Berhasil withdraw saldo QRIS ke saldo akun`,
-        amount: parseInt(amount),
-        saldo_qris: saldoQris,
-        saldo_user: saldoUser
-      });
-
-    } catch (err) {
-      res.status(500).json({ status: false, error: err.message });
     }
   },
   {
