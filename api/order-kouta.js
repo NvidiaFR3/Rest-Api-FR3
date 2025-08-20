@@ -264,49 +264,6 @@ module.exports = [
       }
     }
   },
-  {
-    name: "Withdraw Saldo",
-    desc: "Tarik saldo ke E-Wallet",
-    category: "PaymentGateway",
-    path: "/orderkuota/withdraw?username=&token=&amount=&ewallet=&pajak=",
-    async run(req, res) {
-      const { username, token, amount, ewallet, pajak } = req.query;
-      if (!username) return res.json({ status: false, error: 'Missing username' });
-      if (!token) return res.json({ status: false, error: 'Missing token' });
-      if (!amount) return res.json({ status: false, error: 'Missing amount' });
-      if (!ewallet) return res.json({ status: false, error: 'Missing ewallet type' });
-
-      try {
-        const ok = new OrderKuota(username, token);
-        let nominal = parseInt(amount);
-        let tambahanPajak = pajak ? parseInt(pajak) : 0;
-        let totalPotongan = nominal + tambahanPajak;
-
-        const payload = new URLSearchParams({
-          app_reg_id: OrderKuota.APP_REG_ID,
-          app_version_code: OrderKuota.APP_VERSION_CODE,
-          app_version_name: OrderKuota.APP_VERSION_NAME,
-          auth_username: username,
-          auth_token: token,
-          'requests[qris_withdraw][amount]': nominal,
-          'requests[qris_withdraw][jenis]': ewallet,
-        });
-
-        const wd = await ok.request('POST', `${OrderKuota.API_URL}/get`, payload);
-
-        res.json({
-          status: true,
-          result: {
-            ewallet: ewallet.toUpperCase(),
-            amount: nominal,
-            pajak_tambahan: tambahanPajak,
-            total_potongan: totalPotongan,
-            response: wd
-          }
-        });
-      } catch (err) {
-        res.status(500).json({ status: false, error: err.message });
-      }
     }
   }
 ];
