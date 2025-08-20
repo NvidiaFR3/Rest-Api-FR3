@@ -227,7 +227,7 @@ module.exports = [
   },
   {
     name: "Cek Profile",
-    desc: "Cek Profile + Mutasi QRIS",
+    desc: "Cek Profile + Mutasi QRIS In Orderkouta",
     category: "PaymentGateway",
     path: "/orderkuota/cekprofile?username=&token=",
     async run(req, res) {
