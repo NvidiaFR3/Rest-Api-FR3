@@ -58,7 +58,7 @@ class OrderKuota {
     return await this.request('POST', `${OrderKuota.API_URL}/get`, payload);
   }
 
-  async withdrawalQris(amount = '') {
+  async withdrawalQris(amount = '', ewallet = '') {
     const payload = new URLSearchParams({
       app_reg_id: OrderKuota.APP_REG_ID,
       app_version_code: OrderKuota.APP_VERSION_CODE,
@@ -66,6 +66,7 @@ class OrderKuota {
       auth_username: this.username,
       auth_token: this.authToken,
       'requests[qris_withdraw][amount]': amount,
+      'requests[qris_withdraw][jenis]': ewallet,
     });
     return await this.request('POST', `${OrderKuota.API_URL}/get`, payload);
   }
@@ -221,6 +222,90 @@ module.exports = [
         res.status(200).json({ status: true, result: qrData });
       } catch (error) {
         res.status(500).json({ status: false, error: error.message });
+      }
+    }
+  },
+  {
+    name: "Cek Profile",
+    desc: "Cek Profile + Mutasi QRIS",
+    category: "PaymentGateway",
+    path: "/orderkuota/cekprofile?username=&token=",
+    async run(req, res) {
+      const { username, token } = req.query;
+      if (!username) return res.json({ status: false, error: 'Missing username' });
+      if (!token) return res.json({ status: false, error: 'Missing token' });
+
+      try {
+        const ok = new OrderKuota(username, token);
+        const payload = new URLSearchParams({
+          auth_token: token,
+          auth_username: username,
+          'requests[qris_history][jumlah]': '',
+          'requests[qris_history][jenis]': '',
+          'requests[qris_history][page]': '1',
+          'requests[qris_history][dari_tanggal]': '',
+          'requests[qris_history][ke_tanggal]': '',
+          'requests[qris_history][keterangan]': '',
+          'requests[0]': 'account',
+          'requests[1]': 'qris_history',
+          app_version_name: OrderKuota.APP_VERSION_NAME,
+          app_version_code: OrderKuota.APP_VERSION_CODE,
+          app_reg_id: OrderKuota.APP_REG_ID,
+        });
+
+        const profile = await ok.request('POST', `${OrderKuota.API_URL}/get`, payload);
+
+        res.json({
+          status: true,
+          result: profile
+        });
+      } catch (err) {
+        res.status(500).json({ status: false, error: err.message });
+      }
+    }
+  },
+  {
+    name: "Withdraw Saldo",
+    desc: "Tarik saldo ke E-Wallet",
+    category: "PaymentGateway",
+    path: "/orderkuota/withdraw?username=&token=&amount=&ewallet=&pajak=",
+    async run(req, res) {
+      const { username, token, amount, ewallet, pajak } = req.query;
+      if (!username) return res.json({ status: false, error: 'Missing username' });
+      if (!token) return res.json({ status: false, error: 'Missing token' });
+      if (!amount) return res.json({ status: false, error: 'Missing amount' });
+      if (!ewallet) return res.json({ status: false, error: 'Missing ewallet type' });
+
+      try {
+        const ok = new OrderKuota(username, token);
+        let nominal = parseInt(amount);
+        let tambahanPajak = pajak ? parseInt(pajak) : 0;
+        let totalPotongan = nominal + tambahanPajak;
+
+        const payload = new URLSearchParams({
+          app_reg_id: OrderKuota.APP_REG_ID,
+          app_version_code: OrderKuota.APP_VERSION_CODE,
+          app_version_name: OrderKuota.APP_VERSION_NAME,
+          auth_username: username,
+          auth_token: token,
+          'requests[qris_withdraw][amount]': nominal,
+          'requests[qris_withdraw][jenis]': ewallet,
+        });
+
+        const wd = await ok.request('POST', `${OrderKuota.API_URL}/get`, payload);
+
+        res.json({
+          status: true,
+          result: {
+            ewallet: ewallet.toUpperCase(),
+            amount: nominal,
+            pajak_tambahan: tambahanPajak,
+            total_potongan: totalPotongan,
+            response: wd
+          }
+        });
+      } catch (err) {
+        res.status(500).json({ status: false, error: err.message });
       }
     }
   }
