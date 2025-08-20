@@ -202,46 +202,6 @@ module.exports = [
     }
   },
   {
-    name: "Withdraw QRIS Balance to User Balance",
-    desc: "Cairkan saldo QRIS ke saldo akun user",
-    category: "PaymentGateway",
-    path: "/orderkuota/withdrawqris?username=&token=&amount=",
-    async run(req, res) {
-      const { username, token, amount } = req.query;
-      if (!username) return res.json({ status: false, error: 'Missing username' });
-      if (!token) return res.json({ status: false, error: 'Missing token' });
-      if (!amount) return res.json({ status: false, error: 'Missing amount' });
-
-      try {
-        const ok = new OrderKuota(username, token);
-        let balance = await ok.getBalance();
-
-        let saldoQris = parseInt(balance.account.saldo_qris);
-        let saldoUser = parseInt(balance.account.saldo);
-
-        if (saldoQris < amount) {
-          return res.json({ status: false, error: 'Saldo QRIS tidak mencukupi' });
-        }
-
-        saldoQris -= parseInt(amount);
-        saldoUser += parseInt(amount);
-
-        // ⚠️ Di sini kamu harus update saldo ke DB
-        // await db.updateUserBalance(username, saldoUser, saldoQris);
-
-        res.json({
-          status: true,
-          message: `Berhasil withdraw saldo QRIS ke saldo akun`,
-          amount: parseInt(amount),
-          saldo_qris: saldoQris,
-          saldo_user: saldoUser
-        });
-      } catch (err) {
-        res.status(500).json({ status: false, error: err.message });
-      }
-    }
-  },
-  {
     name: "Cek Mutasi QRIS",
     desc: "Cek Mutasi Qris Orderkuota",
     category: "PaymentGateway",
