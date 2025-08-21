@@ -202,23 +202,50 @@ module.exports = [
     }
   },
   {
-    name: "Cek Mutasi QRIS",
-    desc: "Cek Mutasi Qris Orderkuota",
-    category: "PaymentGateway",
-    path: "/orderkuota/mutasiqr?username=&token=",
-    async run(req, res) {
-      const { username, token } = req.query;
-      if (!username) return res.json({ status: false, error: 'Missing username' });
-      if (!token) return res.json({ status: false, error: 'Missing token' });
-      try {
-        const ok = new OrderKuota(username, token);
-        let login = await ok.getTransactionQris();
-        login = login.qris_history.results.filter(e => e.status === "IN");
-        res.json({ status: true, result: login });
-      } catch (err) {
-        res.status(500).json({ status: false, error: err.message });
+  name: "Cek Mutasi QRIS",
+  desc: "Cek Mutasi Qris Orderkuota",
+  category: "PaymentGateway",
+  path: "/orderkuota/mutasiqr?username=&token=",
+  async run(req, res) {
+    const { username, token } = req.query;
+    if (!username) return res.json({ status: false, error: 'Missing username' });
+    if (!token) return res.json({ status: false, error: 'Missing token' });
+
+    try {
+      const ok = new OrderKuota(username, token);
+
+      const payload = new URLSearchParams({
+        auth_token: token,
+        auth_username: username,
+        'requests[0]': 'account',
+        'requests[1]': 'qris_history',
+        'requests[qris_history][jumlah]': '',
+        'requests[qris_history][jenis]': '',
+        'requests[qris_history][page]': '1',
+        'requests[qris_history][dari_tanggal]': '',
+        'requests[qris_history][ke_tanggal]': '',
+        'requests[qris_history][keterangan]': '',
+        app_version_name: OrderKuota.APP_VERSION_NAME,
+        app_version_code: OrderKuota.APP_VERSION_CODE,
+        app_reg_id: OrderKuota.APP_REG_ID,
+      });
+
+      const result = await ok.request('POST', `${OrderKuota.API_URL}/get`, payload);
+
+      // ⬇️ cek apakah responsenya valid
+      const history = result?.qris_history?.results || result?.qris_history?.data || [];
+
+      if (!Array.isArray(history)) {
+        return res.json({ status: false, error: 'Struktur response tidak sesuai', raw: result });
       }
+
+      const mutasiMasuk = history.filter(e => e.status === "IN");
+
+      res.json({ status: true, result: mutasiMasuk, raw: result });
+    } catch (err) {
+      res.status(500).json({ status: false, error: err.message });
     }
+  }
   },
   {
     name: "Create QRIS Payment",
