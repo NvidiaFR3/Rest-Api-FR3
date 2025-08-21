@@ -111,7 +111,6 @@ class OrderKuota {
   }
 }
 
-// FUNCTION QRIS TOOLS
 function convertCRC16(str) {
   let crc = 0xFFFF;
   for (let c = 0; c < str.length; c++) {
@@ -163,7 +162,6 @@ async function createQRIS(amount, codeqr) {
   };
 }
 
-// ROUTE EXPORT
 module.exports = [
   {
     name: "Get OTP",
@@ -213,7 +211,7 @@ module.exports = [
       try {
         const ok = new OrderKuota(username, token);
         let login = await ok.getTransactionQris();
-        login = login.qris_history.results.filter(e => e.status === "IN");
+        login = login.qris_history.results(e => e.status === "IN");
         res.json({ status: true, result: login });
       } catch (err) {
         res.status(500).json({ status: false, error: err.message });
