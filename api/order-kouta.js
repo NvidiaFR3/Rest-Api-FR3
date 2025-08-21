@@ -44,13 +44,14 @@ class OrderKuota {
     const payload = new URLSearchParams({
       auth_token: this.authToken,
       auth_username: this.username,
+      'requests[0]': 'account',
+      'requests[1]': 'qris_history',
       'requests[qris_history][jumlah]': '',
       'requests[qris_history][jenis]': type,
       'requests[qris_history][page]': '1',
       'requests[qris_history][dari_tanggal]': '',
       'requests[qris_history][ke_tanggal]': '',
       'requests[qris_history][keterangan]': '',
-      'requests[0]': 'account',
       app_version_name: OrderKuota.APP_VERSION_NAME,
       app_version_code: OrderKuota.APP_VERSION_CODE,
       app_reg_id: OrderKuota.APP_REG_ID,
@@ -202,50 +203,31 @@ module.exports = [
     }
   },
   {
-  name: "Cek Mutasi QRIS",
-  desc: "Cek Mutasi Qris Orderkuota",
-  category: "PaymentGateway",
-  path: "/orderkuota/mutasiqr?username=&token=",
-  async run(req, res) {
-    const { username, token } = req.query;
-    if (!username) return res.json({ status: false, error: 'Missing username' });
-    if (!token) return res.json({ status: false, error: 'Missing token' });
+    name: "Cek Mutasi QRIS",
+    desc: "Cek Mutasi Qris Orderkuota",
+    category: "PaymentGateway",
+    path: "/orderkuota/mutasiqr?username=&token=",
+    async run(req, res) {
+      const { username, token } = req.query;
+      if (!username) return res.json({ status: false, error: 'Missing username' });
+      if (!token) return res.json({ status: false, error: 'Missing token' });
+      try {
+        const ok = new OrderKuota(username, token);
+        const result = await ok.getTransactionQris();
 
-    try {
-      const ok = new OrderKuota(username, token);
+        const history = result?.qris_history?.results || result?.qris_history?.data || [];
 
-      const payload = new URLSearchParams({
-        auth_token: token,
-        auth_username: username,
-        'requests[0]': 'account',
-        'requests[1]': 'qris_history',
-        'requests[qris_history][jumlah]': '',
-        'requests[qris_history][jenis]': '',
-        'requests[qris_history][page]': '1',
-        'requests[qris_history][dari_tanggal]': '',
-        'requests[qris_history][ke_tanggal]': '',
-        'requests[qris_history][keterangan]': '',
-        app_version_name: OrderKuota.APP_VERSION_NAME,
-        app_version_code: OrderKuota.APP_VERSION_CODE,
-        app_reg_id: OrderKuota.APP_REG_ID,
-      });
+        if (!Array.isArray(history)) {
+          return res.json({ status: false, error: 'Struktur response tidak sesuai', raw: result });
+        }
 
-      const result = await ok.request('POST', `${OrderKuota.API_URL}/get`, payload);
+        const mutasiMasuk = history.filter(e => e.status === "IN");
 
-      // ⬇️ cek apakah responsenya valid
-      const history = result?.qris_history?.results || result?.qris_history?.data || [];
-
-      if (!Array.isArray(history)) {
-        return res.json({ status: false, error: 'Struktur response tidak sesuai', raw: result });
+        res.json({ status: true, result: mutasiMasuk, raw: result });
+      } catch (err) {
+        res.status(500).json({ status: false, error: err.message });
       }
-
-      const mutasiMasuk = history.filter(e => e.status === "IN");
-
-      res.json({ status: true, result: mutasiMasuk, raw: result });
-    } catch (err) {
-      res.status(500).json({ status: false, error: err.message });
     }
-  }
   },
   {
     name: "Create QRIS Payment",
@@ -266,7 +248,7 @@ module.exports = [
   },
   {
     name: "Cek Profile",
-    desc: "Cek Profile + Mutasi QRIS In Orderkouta",
+    desc: "Cek Profile + Mutasi QRIS In Orderkuota",
     category: "PaymentGateway",
     path: "/orderkuota/cekprofile?username=&token=",
     async run(req, res) {
@@ -276,17 +258,18 @@ module.exports = [
 
       try {
         const ok = new OrderKuota(username, token);
+
         const payload = new URLSearchParams({
           auth_token: token,
           auth_username: username,
+          'requests[0]': 'account',
+          'requests[1]': 'qris_history',
           'requests[qris_history][jumlah]': '',
           'requests[qris_history][jenis]': '',
           'requests[qris_history][page]': '1',
           'requests[qris_history][dari_tanggal]': '',
           'requests[qris_history][ke_tanggal]': '',
           'requests[qris_history][keterangan]': '',
-          'requests[0]': 'account',
-          'requests[1]': 'qris_history',
           app_version_name: OrderKuota.APP_VERSION_NAME,
           app_version_code: OrderKuota.APP_VERSION_CODE,
           app_reg_id: OrderKuota.APP_REG_ID,
@@ -294,9 +277,16 @@ module.exports = [
 
         const profile = await ok.request('POST', `${OrderKuota.API_URL}/get`, payload);
 
+        const account = profile?.account || null;
+        const history = profile?.qris_history?.results || profile?.qris_history?.data || [];
+
         res.json({
           status: true,
-          result: profile
+          result: {
+            account,
+            qris_history: Array.isArray(history) ? history : [],
+          },
+          raw: profile
         });
       } catch (err) {
         res.status(500).json({ status: false, error: err.message });
