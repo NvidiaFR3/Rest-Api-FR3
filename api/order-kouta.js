@@ -204,13 +204,14 @@ module.exports = [
   },
   {
     name: "Cek Mutasi QRIS",
-    desc: "Cek Mutasi Qris Orderkuota",
+    desc: "Ambil transaksi QRIS terakhir yang masuk",
     category: "PaymentGateway",
     path: "/orderkuota/mutasiqr?username=&token=",
     async run(req, res) {
       const { username, token } = req.query;
       if (!username) return res.json({ status: false, error: 'Missing username' });
       if (!token) return res.json({ status: false, error: 'Missing token' });
+
       try {
         const ok = new OrderKuota(username, token);
         const result = await ok.getTransactionQris();
@@ -221,9 +222,15 @@ module.exports = [
           return res.json({ status: false, error: 'Struktur response tidak sesuai', raw: result });
         }
 
+        // filter transaksi masuk & ambil terbaru
         const mutasiMasuk = history.filter(e => e.status === "IN");
+        const transaksiTerakhir = mutasiMasuk.length > 0 ? mutasiMasuk[0] : null;
 
-        res.json({ status: true, result: mutasiMasuk, raw: result });
+        res.json({
+          status: true,
+          last_transaction: transaksiTerakhir,
+          raw: result
+        });
       } catch (err) {
         res.status(500).json({ status: false, error: err.message });
       }
@@ -248,7 +255,7 @@ module.exports = [
   },
   {
     name: "Cek Profile",
-    desc: "Cek Profile + Mutasi QRIS In Orderkuota",
+    desc: "Cek Profile + Transaksi QRIS terakhir masuk",
     category: "PaymentGateway",
     path: "/orderkuota/cekprofile?username=&token=",
     async run(req, res) {
@@ -279,12 +286,14 @@ module.exports = [
 
         const account = profile?.account || null;
         const history = profile?.qris_history?.results || profile?.qris_history?.data || [];
+        const mutasiMasuk = Array.isArray(history) ? history.filter(e => e.status === "IN") : [];
+        const lastTransaction = mutasiMasuk.length > 0 ? mutasiMasuk[0] : null;
 
         res.json({
           status: true,
           result: {
             account,
-            qris_history: Array.isArray(history) ? history : [],
+            last_transaction: lastTransaction
           },
           raw: profile
         });
