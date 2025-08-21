@@ -4,7 +4,6 @@ const crypto = require("crypto");
 const QRCode = require('qrcode');
 const { ImageUploadService } = require('node-upload-images');
 
-// CLASS OrderKuota
 class OrderKuota {
   static API_URL = 'https://app.orderkuota.com:443/api/v2';
   static HOST = 'app.orderkuota.com';
@@ -111,7 +110,6 @@ class OrderKuota {
   }
 }
 
-// FUNCTION QRIS TOOLS
 function convertCRC16(str) {
   let crc = 0xFFFF;
   for (let c = 0; c < str.length; c++) {
@@ -163,7 +161,6 @@ async function createQRIS(amount, codeqr) {
   };
 }
 
-// ROUTE EXPORT
 module.exports = [
   {
     name: "Get OTP",
