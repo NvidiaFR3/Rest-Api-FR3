@@ -184,22 +184,65 @@ module.exports = [
     }
   },
   {
-    name: "Get Token",
-    desc: "Get Token Orderkuota",
-    category: "PaymentGateway",
-    path: "/orderkuota/gettoken?username=&otp=",
-    async run(req, res) {
-      const { username, otp } = req.query;
-      if (!username) return res.json({ creator: "FR3HOSTING", status: false, error: 'Missing username' });
-      if (!otp) return res.json({ creator: "FR3HOSTING", status: false, error: 'Missing otp' });
-      try {
-        const ok = new OrderKuota();
-        const login = await ok.getAuthToken(username, otp);
-        res.json({ creator: "FR3HOSTING", status: true, result: login?.results || {} });
-      } catch (err) {
-        res.status(500).json({ creator: "FR3HOSTING", status: false, error: err.message });
+  name: "Cek Mutasi QRIS",
+  desc: "Cek Mutasi Qris Orderkuota",
+  category: "PaymentGateway",
+  path: "/orderkuota/mutasiqr?username=&token=",
+  async run(req, res) {
+    const { username, token } = req.query;
+    if (!username) return res.json({ status: false, error: 'Missing username' });
+    if (!token) return res.json({ status: false, error: 'Missing token' });
+
+    try {
+      const ok = new OrderKuota(username, token);
+      let data = await ok.getTransactionQris();
+
+      // === DEBUG LOG (hapus kalau sudah fix) ===
+      console.log("RAW DATA FROM ORDERKUOTA ===>", JSON.stringify(data, null, 2));
+
+      // Ambil semua kemungkinan struktur response
+      const raw =
+        data?.qris_history?.results ||
+        data?.qris_history ||
+        data?.results ||
+        data?.data ||
+        data?.transactions ||
+        data;
+
+      let mutasi = [];
+      if (Array.isArray(raw)) {
+        mutasi = raw
+          .filter(e => (e.status || "").toUpperCase() === "IN")
+          .map(e => ({
+            id: e.id || null,
+            debet: e.debet || "0",
+            kredit: e.kredit || "0",
+            saldo_akhir: e.saldo_akhir || "0",
+            keterangan: e.keterangan || "",
+            tanggal: e.tanggal || "",
+            status: e.status || "",
+            fee: e.fee || "",
+            brand: e.brand
+              ? {
+                  name: e.brand.name || "Unknown",
+                  logo: e.brand.logo || ""
+                }
+              : {
+                  name: e.brand_name || "Unknown",
+                  logo: e.brand_logo || ""
+                }
+          }));
       }
+
+      res.json({
+        creator: "FR3HOSTING",
+        status: true,
+        result: mutasi
+      });
+    } catch (err) {
+      res.status(500).json({ status: false, error: err.message });
     }
+  }
   },
   {
     name: "Cek Mutasi QRIS",
