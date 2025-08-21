@@ -172,14 +172,14 @@ module.exports = [
     path: "/orderkuota/getotp?username=&password=",
     async run(req, res) {
       const { username, password } = req.query;
-      if (!username) return res.json({ status: false, error: 'Missing username' });
-      if (!password) return res.json({ status: false, error: 'Missing password' });
+      if (!username) return res.json({ creator: "FR3HOSTING", status: false, error: 'Missing username' });
+      if (!password) return res.json({ creator: "FR3HOSTING", status: false, error: 'Missing password' });
       try {
         const ok = new OrderKuota();
         const login = await ok.loginRequest(username, password);
-        res.json({ status: true, result: login?.results || {} });
+        res.json({ creator: "FR3HOSTING", status: true, result: login?.results || {} });
       } catch (err) {
-        res.status(500).json({ status: false, error: err.message });
+        res.status(500).json({ creator: "FR3HOSTING", status: false, error: err.message });
       }
     }
   },
@@ -190,14 +190,14 @@ module.exports = [
     path: "/orderkuota/gettoken?username=&otp=",
     async run(req, res) {
       const { username, otp } = req.query;
-      if (!username) return res.json({ status: false, error: 'Missing username' });
-      if (!otp) return res.json({ status: false, error: 'Missing otp' });
+      if (!username) return res.json({ creator: "FR3HOSTING", status: false, error: 'Missing username' });
+      if (!otp) return res.json({ creator: "FR3HOSTING", status: false, error: 'Missing otp' });
       try {
         const ok = new OrderKuota();
         const login = await ok.getAuthToken(username, otp);
-        res.json({ status: true, result: login?.results || {} });
+        res.json({ creator: "FR3HOSTING", status: true, result: login?.results || {} });
       } catch (err) {
-        res.status(500).json({ status: false, error: err.message });
+        res.status(500).json({ creator: "FR3HOSTING", status: false, error: err.message });
       }
     }
   },
@@ -208,20 +208,36 @@ module.exports = [
     path: "/orderkuota/mutasiqr?username=&token=",
     async run(req, res) {
       const { username, token } = req.query;
-      if (!username) return res.json({ status: false, error: 'Missing username' });
-      if (!token) return res.json({ status: false, error: 'Missing token' });
+      if (!username) return res.json({ creator: "FR3HOSTING", status: false, error: 'Missing username' });
+      if (!token) return res.json({ creator: "FR3HOSTING", status: false, error: 'Missing token' });
       try {
         const ok = new OrderKuota(username, token);
-        let login = await ok.getTransactionQris();
+        let data = await ok.getTransactionQris();
 
         let mutasi = [];
-        if (login && login.qris_history && Array.isArray(login.qris_history.results)) {
-          mutasi = login.qris_history.results.filter(e => e.status === "IN");
+        const raw = data?.qris_history?.results;
+        if (Array.isArray(raw)) {
+          mutasi = raw
+            .filter(e => e.status === "IN")
+            .map(e => ({
+              id: e.id,
+              debet: e.debet || "0",
+              kredit: e.kredit || "0",
+              saldo_akhir: e.saldo_akhir || "0",
+              keterangan: e.keterangan || "",
+              tanggal: e.tanggal || "",
+              status: e.status || "",
+              fee: e.fee || "",
+              brand: e.brand || {
+                name: e.brand_name || "Unknown",
+                logo: e.brand_logo || ""
+              }
+            }));
         }
 
-        res.json({ status: true, result: mutasi });
+        res.json({ creator: "FR3HOSTING", status: true, result: mutasi });
       } catch (err) {
-        res.status(500).json({ status: false, error: err.message });
+        res.status(500).json({ creator: "FR3HOSTING", status: false, error: err.message });
       }
     }
   },
@@ -232,13 +248,13 @@ module.exports = [
     path: "/orderkuota/createpayment?amount=&codeqr=",
     async run(req, res) {
       const { amount, codeqr } = req.query;
-      if (!amount) return res.json({ status: false, error: 'Amount is required' });
-      if (!codeqr) return res.json({ status: false, error: 'QrCode is required' });
+      if (!amount) return res.json({ creator: "FR3HOSTING", status: false, error: 'Amount is required' });
+      if (!codeqr) return res.json({ creator: "FR3HOSTING", status: false, error: 'QrCode is required' });
       try {
         const qrData = await createQRIS(amount, codeqr);
-        res.status(200).json({ status: true, result: qrData });
+        res.json({ creator: "FR3HOSTING", status: true, result: qrData });
       } catch (error) {
-        res.status(500).json({ status: false, error: error.message });
+        res.status(500).json({ creator: "FR3HOSTING", status: false, error: error.message });
       }
     }
   },
@@ -249,8 +265,8 @@ module.exports = [
     path: "/orderkuota/cekprofile?username=&token=",
     async run(req, res) {
       const { username, token } = req.query;
-      if (!username) return res.json({ status: false, error: 'Missing username' });
-      if (!token) return res.json({ status: false, error: 'Missing token' });
+      if (!username) return res.json({ creator: "FR3HOSTING", status: false, error: 'Missing username' });
+      if (!token) return res.json({ creator: "FR3HOSTING", status: false, error: 'Missing token' });
 
       try {
         const ok = new OrderKuota(username, token);
@@ -272,12 +288,9 @@ module.exports = [
 
         const profile = await ok.request('POST', `${OrderKuota.API_URL}/get`, payload);
 
-        res.json({
-          status: true,
-          result: profile || {}
-        });
+        res.json({ creator: "FR3HOSTING", status: true, result: profile || {} });
       } catch (err) {
-        res.status(500).json({ status: false, error: err.message });
+        res.status(500).json({ creator: "FR3HOSTING", status: false, error: err.message });
       }
     }
   }
