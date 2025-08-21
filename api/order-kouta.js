@@ -111,6 +111,7 @@ class OrderKuota {
   }
 }
 
+// FUNCTION QRIS TOOLS
 function convertCRC16(str) {
   let crc = 0xFFFF;
   for (let c = 0; c < str.length; c++) {
@@ -162,6 +163,7 @@ async function createQRIS(amount, codeqr) {
   };
 }
 
+// ROUTE EXPORT
 module.exports = [
   {
     name: "Get OTP",
@@ -175,7 +177,7 @@ module.exports = [
       try {
         const ok = new OrderKuota();
         const login = await ok.loginRequest(username, password);
-        res.json({ status: true, result: login.results });
+        res.json({ status: true, result: login?.results || {} });
       } catch (err) {
         res.status(500).json({ status: false, error: err.message });
       }
@@ -193,7 +195,7 @@ module.exports = [
       try {
         const ok = new OrderKuota();
         const login = await ok.getAuthToken(username, otp);
-        res.json({ status: true, result: login.results });
+        res.json({ status: true, result: login?.results || {} });
       } catch (err) {
         res.status(500).json({ status: false, error: err.message });
       }
@@ -211,8 +213,13 @@ module.exports = [
       try {
         const ok = new OrderKuota(username, token);
         let login = await ok.getTransactionQris();
-        login = login.qris_history.results(e => e.status === "IN");
-        res.json({ status: true, result: login });
+
+        let mutasi = [];
+        if (login && login.qris_history && Array.isArray(login.qris_history.results)) {
+          mutasi = login.qris_history.results.filter(e => e.status === "IN");
+        }
+
+        res.json({ status: true, result: mutasi });
       } catch (err) {
         res.status(500).json({ status: false, error: err.message });
       }
@@ -237,7 +244,7 @@ module.exports = [
   },
   {
     name: "Cek Profile",
-    desc: "Cek Profile + Mutasi QRIS In Orderkouta",
+    desc: "Cek Profile + Mutasi QRIS In Orderkuota",
     category: "PaymentGateway",
     path: "/orderkuota/cekprofile?username=&token=",
     async run(req, res) {
@@ -267,7 +274,7 @@ module.exports = [
 
         res.json({
           status: true,
-          result: profile
+          result: profile || {}
         });
       } catch (err) {
         res.status(500).json({ status: false, error: err.message });
