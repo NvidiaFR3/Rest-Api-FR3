@@ -202,23 +202,32 @@ module.exports = [
     }
   },
   {
-    name: "Cek Mutasi QRIS",
-    desc: "Cek Mutasi Qris Orderkuota",
-    category: "PaymentGateway",
-    path: "/orderkuota/mutasiqr?username=&token=",
-    async run(req, res) {
-      const { username, token } = req.query;
-      if (!username) return res.json({ status: false, error: 'Missing username' });
-      if (!token) return res.json({ status: false, error: 'Missing token' });
-      try {
-        const ok = new OrderKuota(username, token);
-        let login = await ok.getTransactionQris();
-        login = login.qris_history.results.filter(e => e.status === "IN");
-        res.json({ status: true, result: login });
-      } catch (err) {
-        res.status(500).json({ status: false, error: err.message });
+  name: "Cek Mutasi QRIS",
+  desc: "Cek Mutasi Qris Orderkuota",
+  category: "PaymentGateway",
+  path: "/orderkuota/mutasiqr?username=&token=",
+  async run(req, res) {
+    const { username, token } = req.query;
+    if (!username) return res.json({ status: false, error: 'Missing username' });
+    if (!token) return res.json({ status: false, error: 'Missing token' });
+
+    try {
+      const ok = new OrderKuota(username, token);
+      let login = await ok.getTransactionQris();
+
+      // Pastikan data ada di login.result
+      if (!login || !Array.isArray(login.result)) {
+        return res.json({ status: false, error: "Tidak ada data mutasi" });
       }
+
+      // Filter transaksi IN
+      const mutasi = login.result.filter(e => e.status === "IN");
+
+      res.json({ status: true, result: mutasi });
+    } catch (err) {
+      res.status(500).json({ status: false, error: err.message });
     }
+  }
   },
   {
     name: "Create QRIS Payment",
