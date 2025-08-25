@@ -163,7 +163,6 @@ module.exports = [
     path: "/orderkuota/getotp?username=&password=",
     async run(req, res) {
       const { username, password } = req.query;
-      if (!global.apikey.includes(apikey)) return res.json({ status: false, error: 'Apikey invalid' });
       if (!username) return res.json({ status: false, error: 'Missing username' });
       if (!password) return res.json({ status: false, error: 'Missing password' });
       try {
@@ -182,7 +181,6 @@ module.exports = [
     path: "/orderkuota/gettoken?username=&otp=",
     async run(req, res) {
       const { username, otp } = req.query;
-      if (!global.apikey.includes(apikey)) return res.json({ status: false, error: 'Apikey invalid' });
       if (!username) return res.json({ status: false, error: 'Missing username' });
       if (!otp) return res.json({ status: false, error: 'Missing otp' });
       try {
@@ -201,7 +199,6 @@ module.exports = [
     path: "/orderkuota/mutasiqr?username=&token=",
     async run(req, res) {
       const { username, token } = req.query;
-      if (!global.apikey.includes(apikey)) return res.json({ status: false, error: 'Apikey invalid' });
       if (!username) return res.json({ status: false, error: 'Missing username' });
       if (!token) return res.json({ status: false, error: 'Missing token' });
       try {
@@ -221,7 +218,6 @@ module.exports = [
     path: "/orderkuota/profile?username=&token=",
     async run(req, res) {
       const { username, token } = req.query;
-      if (!global.apikey.includes(apikey)) return res.json({ status: false, error: 'Apikey invalid' });
       if (!username) return res.json({ status: false, error: 'Missing username' });
       if (!token) return res.json({ status: false, error: 'Missing token' });
       try {
@@ -241,7 +237,6 @@ module.exports = [
     path: "/orderkuota/createpayment?amount=&codeqr=",
     async run(req, res) {
       const { amount, codeqr } = req.query;
-      if (!global.apikey.includes(apikey)) return res.json({ status: false, error: 'Apikey invalid' });
       if (!amount) return res.json({ status: false, error: 'Amount is required' });
       if (!codeqr) return res.json({ status: false, error: 'QrCode is required' });
       try {
