@@ -1,9 +1,24 @@
-const fetch = require("node-fetch");
+const morseCode = {
+  "A": ".-", "B": "-...", "C": "-.-.", "D": "-..", "E": ".",
+  "F": "..-.", "G": "--.", "H": "....", "I": "..", "J": ".---",
+  "K": "-.-", "L": ".-..", "M": "--", "N": "-.", "O": "---",
+  "P": ".--.", "Q": "--.-", "R": ".-.", "S": "...", "T": "-",
+  "U": "..-", "V": "...-", "W": ".--", "X": "-..-", "Y": "-.--",
+  "Z": "--..",
+  "0": "-----","1": ".----","2": "..---","3": "...--","4": "....-",
+  "5": ".....","6": "-....","7": "--...","8": "---..","9": "----.",
+  ".": ".-.-.-", ",": "--..--", "?": "..--..", "!": "-.-.--",
+  "/": "-..-.", "(": "-.--.", ")": "-.--.-", "&": ".-...",
+  ":": "---...", ";": "-.-.-.", "=": "-...-", "+": ".-.-.",
+  "-": "-....-", "_": "..--.-", "\"": ".-..-.", "$": "...-..-",
+  "@": ".--.-.", " ": "/"
+};
+const reverseMorse = Object.fromEntries(Object.entries(morseCode).map(([k,v]) => [v,k]));
 
 module.exports = [
   {
     name: "TextToMorse",
-    desc: "Ubah teks jadi Morse",
+    desc: "Convert teks ke Morse (manual, tanpa API key)",
     category: "Tools",
     path: "/tools/texttomorse?text=",
 
@@ -11,24 +26,15 @@ module.exports = [
       const { text } = req.query;
       if (!text) return res.json({ status: false, error: "Masukkan teks. Contoh: ?text=halo" });
 
-      try {
-        const response = await fetch(`https://api.nekoo.qzz.io/api/tools/morse?text=${encodeURIComponent(text)}`);
-        const result = await response.json();
+      const upper = text.toUpperCase();
+      const morse = upper.split("").map(ch => morseCode[ch] || "").join(" ").trim();
 
-        res.json({
-          status: true,
-          input: text,
-          output: result?.result || result?.morse || "Tidak ada output"
-        });
-
-      } catch (err) {
-        res.status(500).json({ status: false, error: "Gagal koneksi ke Neko API", detail: err.message });
-      }
+      res.json({ status: true, input: text, output: morse });
     }
   },
   {
     name: "MorseToText",
-    desc: "Ubah kode Morse jadi teks",
+    desc: "Convert Morse ke teks (manual, tanpa API key)",
     category: "Tools",
     path: "/tools/morsetotext?kode=",
 
@@ -36,19 +42,10 @@ module.exports = [
       const { kode } = req.query;
       if (!kode) return res.json({ status: false, error: "Masukkan kode Morse. Contoh: ?kode=.... .- .-.. ---" });
 
-      try {
-        const response = await fetch(`https://api.nekoo.qzz.io/api/tools/morse/decode?morse=${encodeURIComponent(kode)}`);
-        const result = await response.json();
+      const words = kode.trim().split(" ");
+      const text = words.map(code => reverseMorse[code] || "").join("");
 
-        res.json({
-          status: true,
-          input: kode,
-          output: result?.result || result?.text || "Tidak ada output"
-        });
-
-      } catch (err) {
-        res.status(500).json({ status: false, error: "Gagal koneksi ke Neko API", detail: err.message });
-      }
+      res.json({ status: true, input: kode, output: text });
     }
   }
 ];
