@@ -18,7 +18,7 @@ const reverseMorse = Object.fromEntries(Object.entries(morseCode).map(([k,v]) =>
 module.exports = [
   {
     name: "TextToMorse",
-    desc: "Convert teks ke Morse (manual, tanpa API key)",
+    desc: "Convert teks ke Morse",
     category: "Tools",
     path: "/tools/texttomorse?text=",
 
@@ -34,7 +34,7 @@ module.exports = [
   },
   {
     name: "MorseToText",
-    desc: "Convert Morse ke teks (manual, tanpa API key)",
+    desc: "Convert Morse ke teks",
     category: "Tools",
     path: "/tools/morsetotext?kode=",
 
