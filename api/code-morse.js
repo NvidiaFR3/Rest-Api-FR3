@@ -3,7 +3,7 @@ const fetch = require("node-fetch");
 module.exports = [
   {
     name: "TextToMorse",
-    desc: "Ubah teks jadi Morse (via Neko API)",
+    desc: "Ubah teks jadi Morse",
     category: "Tools",
     path: "/tools/texttomorse?text=",
 
@@ -28,7 +28,7 @@ module.exports = [
   },
   {
     name: "MorseToText",
-    desc: "Ubah kode Morse jadi teks (via Neko API)",
+    desc: "Ubah kode Morse jadi teks",
     category: "Tools",
     path: "/tools/morsetotext?kode=",
 
