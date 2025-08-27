@@ -1051,52 +1051,40 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       const card = document.createElement("div"); 
       card.className = "api-card";
-      card.style.animationDelay = `${index * 0.05}s`;
+      // Apply animation delay for staggered appearance
+      card.style.animationDelay = `${index * 0.1}s`; 
 
-      const method = 'GET'; 
-      const methodClass = `method-${method.toLowerCase()}`; 
+      const methodClass = `method-${api.method?.toLowerCase() || 'get'}`;
+      const methodText = api.method?.toUpperCase() || 'GET';
 
       card.innerHTML = `
         <div class="api-info">
-          <h3>
-            <span class="method-badge ${methodClass}">${method}</span> ${api.name || 'Untitled API'}
-          </h3>
-          <p>${api.desc || 'No description provided.'}</p>
+          <h3>${api.name || "Unnamed Endpoint"}</h3>
+          <p>${api.desc || "No description available."}</p>
         </div>
-        <button class="play-button" 
-                data-endpoint="${api.path || ''}" 
-                data-name="${api.name || 'Untitled API'}" 
-                data-description="${api.desc || 'No description provided.'}" 
-                data-method="${method}" 
-                data-params='${JSON.stringify(extractParams(api.path) || [])}'> 
-          Try It <i class="fas fa-arrow-right"></i>
-        </button>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span class="method-badge ${methodClass}">${methodText}</span>
+          <button class="play-button" data-category="${category}" data-name="${api.name}">
+            <i class="fas fa-play"></i> Try It
+          </button>
+        </div>
       `;
       apiList.appendChild(card);
     });
-  }
 
-  // Helper function to extract parameters from path string like "/download/bstation?apikey=&url="
-  function extractParams(path) {
-    if (!path || !path.includes('?')) return []; 
-    const paramString = path.split('?')[1];
-    if (!paramString) return []; 
-
-    const params = [];
-    const pairs = paramString.split('&');
-    pairs.forEach(pair => {
-      const trimmedPair = pair.trim(); 
-      if (trimmedPair) { 
-        const key = trimmedPair.split('=')[0];
-        if (key) {
-          params.push({
-            name: key,
-            description: key 
-          });
-        }
+    // Add event listeners to the "Try It" buttons
+    document.querySelectorAll('.play-button').forEach(button => {
+      if (button.textContent.includes('Try It')) {
+        button.addEventListener('click', function() {
+          const category = this.getAttribute('data-category');
+          const name = this.getAttribute('data-name');
+          const endpoint = apis[category].find(api => api.name === name);
+          if (endpoint) {
+            showModal(endpoint, category);
+          }
+        });
       }
     });
-    return params;
   }
 
   function renderTabs() {
