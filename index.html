@@ -802,7 +802,7 @@
         <button id="themeToggle" class="nav-icon" aria-label="Toggle Theme">
           <i class="fas fa-moon"></i> 
         </button>
-        <a href="https://github.com/yourusername/yourrepository" class="source-code-btn" target="_blank">
+        <a href="https://youtu.be/xvFZjo5PgG0?si=EH_KvVsImwFltZbH" class="source-code-btn" target="_blank">
           <i class="fab fa-github"></i> Source Code
         </a>
       </div>
@@ -862,7 +862,7 @@
       <button class="close-btn" onclick="closeDonationModal()">×</button>
       <h3>Support Developer FR3</h3>
       <p>Api Ini Di Dukung Penuh Oleh FR3.<br>Jika Anda Ada Sedikit Rezeki, Silahkan Donate FR3 sebagai Support Developer.</p>
-      <img id="qrisImage" src="https://img1.pixhost.to/images/7125/620815169_desta.jpg" alt="QRIS Donation">
+      <img id="qrisImage" src="https://files.catbox.moe/wkqf6h.png" alt="QRIS Donation">
       <p>Setiap Donasi Menambah Dukungan!</p>
     </div>
   </div>
@@ -1051,40 +1051,52 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       const card = document.createElement("div"); 
       card.className = "api-card";
-      // Apply animation delay for staggered appearance
-      card.style.animationDelay = `${index * 0.1}s`; 
+      card.style.animationDelay = `${index * 0.05}s`;
 
-      const methodClass = `method-${api.method?.toLowerCase() || 'get'}`;
-      const methodText = api.method?.toUpperCase() || 'GET';
+      const method = 'GET'; 
+      const methodClass = `method-${method.toLowerCase()}`; 
 
       card.innerHTML = `
         <div class="api-info">
-          <h3>${api.name || "Unnamed Endpoint"}</h3>
-          <p>${api.desc || "No description available."}</p>
+          <h3>
+            <span class="method-badge ${methodClass}">${method}</span> ${api.name || 'Untitled API'}
+          </h3>
+          <p>${api.desc || 'No description provided.'}</p>
         </div>
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-          <span class="method-badge ${methodClass}">${methodText}</span>
-          <button class="play-button" data-category="${category}" data-name="${api.name}">
-            <i class="fas fa-play"></i> Try It
-          </button>
-        </div>
+        <button class="play-button" 
+                data-endpoint="${api.path || ''}" 
+                data-name="${api.name || 'Untitled API'}" 
+                data-description="${api.desc || 'No description provided.'}" 
+                data-method="${method}" 
+                data-params='${JSON.stringify(extractParams(api.path) || [])}'> 
+          Try It <i class="fas fa-arrow-right"></i>
+        </button>
       `;
       apiList.appendChild(card);
     });
+  }
 
-    // Add event listeners to the "Try It" buttons
-    document.querySelectorAll('.play-button').forEach(button => {
-      if (button.textContent.includes('Try It')) {
-        button.addEventListener('click', function() {
-          const category = this.getAttribute('data-category');
-          const name = this.getAttribute('data-name');
-          const endpoint = apis[category].find(api => api.name === name);
-          if (endpoint) {
-            showModal(endpoint, category);
-          }
-        });
+  // Helper function to extract parameters from path string like "/download/bstation?apikey=&url="
+  function extractParams(path) {
+    if (!path || !path.includes('?')) return []; 
+    const paramString = path.split('?')[1];
+    if (!paramString) return []; 
+
+    const params = [];
+    const pairs = paramString.split('&');
+    pairs.forEach(pair => {
+      const trimmedPair = pair.trim(); 
+      if (trimmedPair) { 
+        const key = trimmedPair.split('=')[0];
+        if (key) {
+          params.push({
+            name: key,
+            description: key 
+          });
+        }
       }
     });
+    return params;
   }
 
   function renderTabs() {
