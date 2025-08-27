@@ -231,45 +231,45 @@ module.exports = [
     }
   },
   {
-  name: "Withdraw QRIS",
-  desc: "Cairkan saldo QRIS ke saldo utama",
-  category: "Orderkuota",
-  path: "/orderkuota/wdqr?username=&token=&amount=",
-  async run(req, res) {
-    const { username, token, amount } = req.query;
-    if (!username) return res.json({ status: false, error: 'Missing username' });
-    if (!token) return res.json({ status: false, error: 'Missing token' });
-    if (!amount) return res.json({ status: false, error: 'Missing amount' });
+    name: "Withdraw QRIS",
+    desc: "Cairkan saldo QRIS ke saldo utama",
+    category: "Orderkuota",
+    path: "/orderkuota/wdqr?username=&token=&amount=",
+    async run(req, res) {
+      const { username, token, amount } = req.query;
+      if (!username) return res.json({ status: false, error: 'Missing username' });
+      if (!token) return res.json({ status: false, error: 'Missing token' });
+      if (!amount) return res.json({ status: false, error: 'Missing amount' });
 
-    try {
-      const ok = new OrderKuota(username, token);
-      const wd = await ok.withdrawalQris(amount);
+      try {
+        const ok = new OrderKuota(username, token);
+        const wd = await ok.withdrawalQris(amount);
 
-      // Ambil data akun (biar respon sama dengan contoh)
-      const profile = await ok.getTransactionQris();
+        // Ambil data akun (biar respon sama dengan contoh)
+        const profile = await ok.getTransactionQris();
 
-      // Format respon sesuai contoh
-      res.json({
-        creator: "FR3-NEWERA",
-        status: true,
-        result: {
-          success: true,
-          qris_withdraw: {
-            success: wd?.qris_withdraw?.success ?? false,
-            message: wd?.qris_withdraw?.message || "Gagal memproses pencairan."
-          },
-          account: {
-            success: profile?.account?.success ?? true,
-            results: profile?.account?.results ?? {}
+        // Format respon sesuai contoh
+        res.json({
+          creator: "FR3-NEWERA",
+          status: true,
+          result: {
+            success: true,
+            qris_withdraw: {
+              success: wd?.qris_withdraw?.success ?? false,
+              message: wd?.qris_withdraw?.message || "Gagal memproses pencairan."
+            },
+            account: {
+              success: profile?.account?.success ?? true,
+              results: profile?.account?.results ?? {}
+            }
           }
-        }
-      });
+        });
 
-    } catch (err) {
-      res.status(500).json({ status: false, error: err.message });
+      } catch (err) {
+        res.status(500).json({ status: false, error: err.message });
       }
     }
-  };
+  },
   {
     name: "Create QRIS Payment",
     desc: "Generate QR Code Payment",
