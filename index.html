@@ -984,6 +984,43 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
   navbarRight.appendChild(donateBtn);
 
+  // Function to extract parameters from URL path
+  function extractParams(path) {
+    if (!path || !path.includes('?')) return [];
+    
+    const paramString = path.split('?')[1];
+    if (!paramString) return [];
+    
+    const params = [];
+    const paramPairs = paramString.split('&');
+    
+    paramPairs.forEach(pair => {
+      const [name] = pair.split('=');
+      if (name) {
+        params.push({
+          name: name,
+          required: true,
+          placeholder: `Enter ${name}`,
+          description: name
+        });
+      }
+    });
+    
+    return params;
+  }
+
+  // Function to determine API method based on path
+  function determineMethod(path) {
+    if (!path) return 'GET';
+    
+    // You can add logic here to determine method based on path patterns
+    if (path.includes('/download/') || path.includes('/imagecreator/')) {
+      return 'GET';
+    }
+    
+    return 'GET'; // Default to GET
+  }
+
   try {
     const settingsResponse = await fetch("/set");
     if (!settingsResponse.ok) {
@@ -1053,7 +1090,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       card.className = "api-card";
       card.style.animationDelay = `${index * 0.05}s`;
 
-      const method = api.method || 'GET'; 
+      // Extract parameters from path and determine method
+      const params = extractParams(api.path);
+      const method = determineMethod(api.path);
+
       const methodClass = `method-${method.toLowerCase()}`; 
 
       card.innerHTML = `
@@ -1068,7 +1108,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 data-name="${api.name || 'Untitled API'}" 
                 data-description="${api.desc || 'No description provided.'}" 
                 data-method="${method}" 
-                data-params='${JSON.stringify(api.params || [])}'> 
+                data-params='${JSON.stringify(params)}'> 
           Try It <i class="fas fa-arrow-right"></i>
         </button>
       `;
@@ -1128,7 +1168,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (params.length > 0) {
         params.forEach(param => {
           const label = document.createElement("label");
-          label.textContent = param.name;
+          label.textContent = `${param.name}${param.required ? ' *' : ''}`;
           label.htmlFor = `param-${param.name}`;
           
           const input = document.createElement("input");
@@ -1141,6 +1181,9 @@ document.addEventListener('DOMContentLoaded', async () => {
           paramForm.appendChild(label);
           paramForm.appendChild(input);
         });
+      } else {
+        // If no parameters, show a message
+        paramForm.innerHTML = '<p>No parameters required for this endpoint.</p>';
       }
       
       modal.classList.add("active");
