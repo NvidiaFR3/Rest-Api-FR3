@@ -60,11 +60,11 @@ global.totalreq = 0;
 
 // Settings
 const settings = {
-  creatorName: "FR3-NEWERA",
-  whatsappLink: "https://wa.me/62882008771871",
-  apiTitle: "FR3 Api's",
-  githubLink: "https://NvidiaFR3",
-  instagramLink: "https://www.instagram.com/rendyindrapratama3"
+  creatorName: "FR3-NEWERA", // isi nama mu
+  whatsappLink: "https://t.me/fr3newera", // isi tele mu
+  apiTitle: "FR3 Api's", // isi nama api mu
+  githubLink: "https://NvidiaFR3", // isi Link Github Mu
+  instagramLink: "https://www.instagram.com/rendyindrapratama3" // isi link ig mu
 };
 
 
