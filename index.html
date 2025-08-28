@@ -1031,7 +1031,6 @@
         return 'GET';
       }
     
-      // Fungsi untuk menghitung total endpoint
       function countTotalEndpoints(apis) {
         let total = 0;
         for (const category in apis) {
@@ -1058,10 +1057,6 @@
         document.getElementById("navname").textContent = settings.creatorName || "FR3 DEV";
         document.getElementById("apiTitle").textContent = settings.apiTitle || "FR3 Api's";
         
-        // Update base URL dan informasi endpoint
-        // baseUrlText.textContent = window.location.origin; // This line is commented out as baseUrlText element is removed
-        
-        // Hitung dan tampilkan total endpoint dan kategori
         const totalEndpoints = countTotalEndpoints(apis);
         const totalCategories = Object.keys(apis).length;
         
@@ -1088,7 +1083,6 @@
         document.getElementById("page").textContent = "API Documentation (Error)";
         document.getElementById("navname").textContent = "FR3 DEV";
         document.getElementById("apiTitle").textContent = "FR3 Api's";
-        // baseUrlText.textContent = window.location.origin; // This line is commented out as baseUrlText element is removed
         totalEndpointsSpan.textContent = "0 Endpoints";
         totalCategoriesSpan.textContent = "0 Categories";
         document.getElementById("contactdev").href = "#";
