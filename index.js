@@ -55,7 +55,7 @@ global.totalreq = 0;
 const settings = {
   creatorName: "FR3-NEWERA",
   whatsappLink: "https://wa.me/62882008771871",
-  apiTitle: "NvidiaBotz Api's",
+  apiTitle: "FR3 Api's",
   githubLink: "https://NvidiaFR3",
   instagramLink: "https://wa.me/62882008771871"
 };
