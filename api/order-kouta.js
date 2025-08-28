@@ -271,6 +271,50 @@ module.exports = [
     }
   },
   {
+    name: "Withdraw E-Wallet Dana",
+    desc: "Cairkan saldo langsung ke E-Wallet Dana",
+    category: "Orderkuota",
+    path: "/orderkuota/wdDana?username=&token=&amount=&phone=",
+    async run(req, res) {
+      const { username, token, amount, phone } = req.query;
+      if (!username) return res.json({ status: false, error: 'Missing username' });
+      if (!token) return res.json({ status: false, error: 'Missing token' });
+      if (!amount) return res.json({ status: false, error: 'Missing amount' });
+      if (!phone) return res.json({ status: false, error: 'Missing phone (Dana number)' });
+
+      try {
+        const ok = new OrderKuota(username, token);
+
+        // payload withdraw ke ewallet
+        const payload = new URLSearchParams({
+          app_reg_id: OrderKuota.APP_REG_ID,
+          app_version_code: OrderKuota.APP_VERSION_CODE,
+          app_version_name: OrderKuota.APP_VERSION_NAME,
+          auth_username: username,
+          auth_token: token,
+          'requests[ewallet_withdraw][amount]': amount,
+          'requests[ewallet_withdraw][ewallet]': 'DANA',
+          'requests[ewallet_withdraw][phone]': phone
+        });
+
+        const wd = await ok.request('POST', `${OrderKuota.API_URL}/get`, payload);
+
+        res.json({
+          creator: "FR3-NEWERA",
+          status: true,
+          result: {
+            success: wd?.ewallet_withdraw?.success ?? false,
+            message: wd?.ewallet_withdraw?.message || "Gagal memproses pencairan ke Dana.",
+            withdraw: wd?.ewallet_withdraw ?? {}
+          }
+        });
+
+      } catch (err) {
+        res.status(500).json({ status: false, error: err.message });
+      }
+    }
+  },
+  {
     name: "Create QRIS Payment",
     desc: "Generate QR Code Payment",
     category: "Orderkuota",
