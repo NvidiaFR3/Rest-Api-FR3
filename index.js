@@ -54,10 +54,10 @@ global.apikey = process.env.APIKEY || null;
 global.totalreq = 0;
 const settings = {
   creatorName: "FR3-NEWERA",
-  whatsappLink: "https://wa.me/62882008771871",
+  whatsappLink: "https://t.me/fr3newera",
   apiTitle: "FR3 Api's",
   githubLink: "https://NvidiaFR3",
-  instagramLink: "https://wa.me/62882008771871"
+  instagramLink: "https://instagram.com/rendyindrapratama3"
 };
 
 app.use((req, res, next) => {
