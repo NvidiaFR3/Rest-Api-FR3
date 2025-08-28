@@ -8,19 +8,14 @@ require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 4000;
-
-// Middleware
 app.enable("trust proxy");
 app.set("json spaces", 2);
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cors());
-
-// Static
 app.use('/', express.static(path.join(__dirname, '/')));
 app.use('/', express.static(path.join(__dirname, 'ui')));
 app.use('/api', express.static(path.join(__dirname, 'api')));
-// Global Helpers
 global.getBuffer = async (url, options = {}) => {
   try {
     const res = await axios({
@@ -57,18 +52,14 @@ global.fetchJson = async (url, options = {}) => {
 
 global.apikey = process.env.APIKEY || null;
 global.totalreq = 0;
-
-// Settings
 const settings = {
-  creatorName: "FR3-NEWERA", // isi nama mu
-  whatsappLink: "https://t.me/fr3newera", // isi tele mu
-  apiTitle: "FR3 Api's", // isi nama api mu
-  githubLink: "https://NvidiaFR3", // isi Link Github Mu
-  instagramLink: "https://www.instagram.com/rendyindrapratama3" // isi link ig mu
+  creatorName: "FR3-NEWERA",
+  whatsappLink: "https://wa.me/62882008771871",
+  apiTitle: "NvidiaBotz Api's",
+  githubLink: "https://NvidiaFR3",
+  instagramLink: "https://wa.me/62882008771871"
 };
 
-
-// Global JSON Response Wrapper
 app.use((req, res, next) => {
   global.totalreq += 1;
 
@@ -91,8 +82,6 @@ app.use((req, res, next) => {
 });
 
 app.get('/set', (req, res) => res.json(settings));
-
-// Dynamic route loader with sorted categories and endpoints
 let totalRoutes = 0;
 let rawEndpoints = {};
 const apiFolder = path.join(__dirname, 'api');
@@ -146,7 +135,6 @@ app.get('/', (req, res) => {
   }
 });
 
-// Start Server
 app.listen(PORT, () => {
   console.log(chalk.bgGreen.black(` 🚀 Server is running on port ${PORT} `));
   console.log(chalk.bgCyan.black(` 📦 Total Routes Loaded: ${totalRoutes} `));

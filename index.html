@@ -3,19 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  
-  <!-- SEO Meta -->
   <title id="page">API FR3</title>
   <meta name="description" content="API FR3 adalah lightweight API untuk WhatsApp Bots dengan performa cepat, stabil, dan mudah digunakan. Dukung pengembangan kami dengan donasi!">
   <meta property="og:title" content="API FR3" />
   <meta property="og:description" content="API FR3 adalah API ringan dan cepat untuk integrasi WhatsApp Bots. Cocok untuk developer yang butuh solusi efisien. Dukung kami dengan donasi untuk pengembangan lebih lanjut!" />
   <meta property="og:image" content="https://img1.pixhost.to/images/7125/620815169_desta.jpg" />
   <meta property="og:url" content="https://api.nvidiabotz.xyz/" />
-  
-  <!-- Favicon -->
   <link id="icon" rel="icon" href="https://img1.pixhost.to/images/7125/620815169_desta.jpg" type="image/png">  
-  
-  <!-- Fonts & Icons -->
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
@@ -37,20 +31,20 @@
       --warning: #ffc107;
       --info: #17a2b8;
       --text-gray: #6c757d;
-      --transition-speed: 0.3s ease-in-out; /* Smooth transition */
+      --transition-speed: 0.3s ease-in-out;
     }
 
     body.dark-theme {
-      --background-light: #2c3e50; /* Darker, elegant blue-gray */
-      --text-light: #ecf0f1; /* Light gray for text */
-      --primary-light: #3498db; /* Softer blue */
-      --secondary-light: #95a5a6; /* Muted gray */
-      --card-bg-light: #34495e; /* Darker card background */
-      --border-light: #4a627a; /* Darker border */
+      --background-light: #2c3e50;
+      --text-light: #ecf0f1;
+      --primary-light: #3498db;
+      --secondary-light: #95a5a6;
+      --card-bg-light: #34495e;
+      --border-light: #4a627a;
       --shadow-light: rgba(0, 0, 0, 0.3);
-      --input-bg-light: #4a627a; /* Darker input background */
-      --input-border-light: #6c757d; /* Darker input border */
-      --code-bg-light: #212529; /* Even darker for code blocks */
+      --input-bg-light: #4a627a;
+      --input-border-light: #6c757d;
+      --code-bg-light: #212529;
       --code-border-light: #495057;
     }
 
@@ -65,7 +59,6 @@
       overflow-x: hidden;
     }
 
-    /* Loading Screen */
     #loading-screen {
       position: fixed;
       top: 0;
@@ -105,7 +98,7 @@
       max-width: 1200px;
       margin: 20px auto;
       padding: 0 20px;
-      display: none; /* Hidden until loading is complete */
+      display: none;
     }
 
     .navbar {
@@ -325,9 +318,9 @@
       flex-direction: column;
       justify-content: space-between;
       transition: background-color var(--transition-speed), transform 0.3s ease, box-shadow 0.3s ease;
-      opacity: 0; /* Start hidden for animation */
-      transform: translateY(20px); /* Start slightly below */
-      animation: fadeInSlideUp 0.6s forwards; /* Animation applied by JS */
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInSlideUp 0.6s forwards;
     }
 
     @keyframes fadeInSlideUp {
@@ -390,7 +383,6 @@
       transform: translateY(-2px);
     }
 
-    /* Modal Styles */
     .modal {
       position: fixed;
       top: 0;
@@ -477,7 +469,7 @@
     .modal-body.hide-form-elements #submitParamBtn {
       max-height: 0;
       opacity: 0;
-      pointer-events: none; /* Disable interactions */
+      pointer-events: none;
       margin-bottom: 0;
       padding-bottom: 0;
     }
@@ -565,7 +557,7 @@
 
     .copy-section.active {
       opacity: 1;
-      max-height: 60px; /* Adjust based on content height */
+      max-height: 60px;
     }
 
     #copyEndpointText {
@@ -606,7 +598,6 @@
       color: var(--primary-light);
     }
 
-    /* Donation Modal */
     .donation-modal {
       position: fixed;
       top: 0;
@@ -670,7 +661,7 @@
     }
 
     .donation-modal-content img.zoomed {
-      transform: scale(1.5); /* Zoom effect */
+      transform: scale(1.5);
       cursor: zoom-out;
     }
 
@@ -690,7 +681,6 @@
       color: var(--danger);
     }
 
-    /* Responsive adjustments */
     @media (max-width: 768px) {
       .navbar-container {
         flex-direction: column;
@@ -787,8 +777,6 @@
     <div class="loading-text">Loading ...</div>
   </div>
   
-  
-
   <header class="navbar">
     <div class="navbar-container">
       <div class="navbar-left">
@@ -813,7 +801,7 @@
     <section class="hero fade-in">
       <div class="title-container">
         <i class="fab fa-node-js icon-title"></i> 
-        <h2 id="apiTitle">NvidiaBotz Api</h2> 
+        <h2 id="apiTitle">FR3 Api</h2> 
       </div>
       <p>Simple and fast API for full-featured WhatsApp Bot integration with comprehensive documentation and easy-to-use endpoints. Explore our powerful tools to enhance your bot capabilities.</p> 
       <section id="apiLinks">
@@ -856,7 +844,6 @@
     </div>
   </div>
 
-  <!-- Donation Modal -->
   <div class="donation-modal" id="donationModal">
     <div class="donation-modal-content">
       <button class="close-btn" onclick="closeDonationModal()">×</button>
@@ -900,7 +887,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   let currentEndpoint = ""; 
   let settings = {}, apis = {};
 
-  // Theme handling
   const savedTheme = localStorage.getItem('theme');
   if (savedTheme) {
     document.body.classList.add(savedTheme);
@@ -936,7 +922,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       setTimeout(() => {
         loadingScreen.style.display = 'none';
         
-        // Show donation modal after loading is complete
         if (!localStorage.getItem('donationShown')) {
           donationModal.classList.add('active');
           localStorage.setItem('donationShown', 'true');
@@ -956,7 +941,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }, 300); 
   };
 
-  // Donation modal handling
   window.closeDonationModal = function() {
     donationModal.classList.remove('active');
   };
@@ -965,7 +949,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (e.target === this) closeDonationModal();
   });
 
-  // Toggle QR code zoom
   const qrisImage = document.getElementById('qrisImage');
   if (qrisImage) {
     qrisImage.addEventListener('click', () => {
@@ -973,7 +956,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  // Add donation button to navbar
   const navbarRight = document.querySelector('.navbar-right');
   const donateBtn = document.createElement('button');
   donateBtn.className = 'nav-icon';
@@ -984,7 +966,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
   navbarRight.appendChild(donateBtn);
 
-  // Function to extract parameters from URL path
   function extractParams(path) {
     if (!path || !path.includes('?')) return [];
     
@@ -1009,16 +990,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     return params;
   }
 
-  // Function to determine API method based on path
   function determineMethod(path) {
     if (!path) return 'GET';
-    
-    // You can add logic here to determine method based on path patterns
     if (path.includes('/download/') || path.includes('/imagecreator/')) {
       return 'GET';
     }
     
-    return 'GET'; // Default to GET
+    return 'GET';
   }
 
   try {
@@ -1035,7 +1013,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     apis = await apisResponse.json();
 
     document.getElementById("navname").textContent = settings.creatorName || "FR3 DEV";
-    document.getElementById("apiTitle").textContent = settings.apiTitle || "NvidiaBotz Api's";
+    document.getElementById("apiTitle").textContent = settings.apiTitle || "FR3 Api's";
     baseUrlText.textContent = window.location.origin;
     document.getElementById("contactdev").href = window.location.origin || "#";
     document.querySelector('footer .contact a[aria-label="WhatsApp"]').href = settings.whatsappLink || "https://wa.me/yourwhatsapplink";
@@ -1056,7 +1034,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.error("Error loading API settings or endpoints:", err);
     document.getElementById("page").textContent = "API Documentation (Error)";
     document.getElementById("navname").textContent = "FR3 DEV";
-    document.getElementById("apiTitle").textContent = "NvidiaBotz Api's";
+    document.getElementById("apiTitle").textContent = "FR3 Api's";
     baseUrlText.textContent = window.location.origin;
     document.getElementById("contactdev").href = "#";
     apiList.innerHTML = `<p style="text-align: center; color: var(--danger); margin-top: 2rem;">
@@ -1067,7 +1045,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     hideLoadingScreen();
   }
 
-  // Function to render API cards
   function renderApiCards(category) {
     apiList.innerHTML = "";
     const filteredApis = category === "All" ? Object.values(apis).flat() : apis[category] || [];
@@ -1090,7 +1067,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       card.className = "api-card";
       card.style.animationDelay = `${index * 0.05}s`;
 
-      // Extract parameters from path and determine method
       const params = extractParams(api.path);
       const method = determineMethod(api.path);
 
@@ -1182,7 +1158,6 @@ document.addEventListener('DOMContentLoaded', async () => {
           paramForm.appendChild(input);
         });
       } else {
-        // If no parameters, show a message
         paramForm.innerHTML = '<p>No parameters required for this endpoint.</p>';
       }
       
@@ -1202,7 +1177,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const formData = new FormData(paramForm);
     let isValid = true;
     
-    // Validate required fields
     for (const [key, value] of formData.entries()) {
       const input = paramForm.querySelector(`[name="${key}"]`);
       if (input && input.required && !value) {
