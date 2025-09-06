@@ -1,116 +1,84 @@
-const fetch = require("node-fetch")
-const ai = {
-    getRandom: () => {
-        const gen = (length, charSet = {}) => {
-            const l = "abcdefghijklmnopqrstuvwxyz" // lowercase
-            const u = l.toUpperCase() // uppercase
-            const s = "-_" // symbol
-            const n = "0123456789" // number
+const axios = require("axios");
 
-            let cs = "" // character set
-            const { lowerCase = false, upperCase = false, symbol = false, number = false } = charSet
+async function deepsek(question, { system_prompt = null, model = "deepseek-v3" } = {}) {
+  const allowedModels = ["deepseek-v3", "deepseek-r1"];
 
-            if (!lowerCase && !upperCase && !symbol && !number) {
-                cs += l + u + s + n
-            } else {
-                if (lowerCase) cs += l
-                if (upperCase) cs += u
-                if (symbol) cs += s
-                if (number) cs += n
-            }
+  if (!question) throw new Error("Question is required");
+  if (!allowedModels.includes(model)) throw new Error(`Available models: ${allowedModels.join(", ")}`);
 
-            const result = Array.from({ length }, (_ => cs[Math.floor(Math.random() * cs.length)])).join("") || null
-            return result
-        }
-
-        const id = gen(16, { upperCase: true, lowerCase: true, number: true }) //TXulzbGqk0EDzPeT
-        const chatId = `chat-${new Date().getTime()}-${gen(9, { lowerCase: true, number: true })}` //chat-1749292523602-k0tna5ef8
-        const userId = `local-user-${new Date().getTime()}-${gen(9, { lowerCase: true, number: true })}` //local-user-1749292766705-b49yu10mm
-        const antiBotId = `${gen(32)}-${gen(8, { number: true, lowerCase: true })}` //jUxRXb2xJbf8BVmIn2NGhncRQePiIiNE-8gvna4dd
-        return { id, chatId, userId, antiBotId }
+  const response = await axios.post(
+    "https://api.appzone.tech/v1/chat/completions",
+    {
+      messages: [
+        ...(system_prompt
+          ? [
+              {
+                role: "system",
+                content: [{ type: "text", text: system_prompt }],
+              },
+            ]
+          : []),
+        {
+          role: "user",
+          content: [{ type: "text", text: question }],
+        },
+      ],
+      model: model,
+      isSubscribed: true,
     },
-
-    generate: async (messages, systemPrompt, model) => {
-
-        const body = JSON.stringify(
-            {
-                messages,
-                systemPrompt,
-                model,
-                "isAuthenticated": true,
-                ...ai.getRandom()
-            }
-        )
-
-        const headers = {
-            "content-type": "application/json",
-        }
-
-        const response = await fetch("https://exomlapi.com/api/chat", {
-            headers,
-            body,
-            "method": "post"
-        })
-
-        if (!response.ok) throw Error(`woops.. response is not ok! ${response.status} ${response.statusText}\n\n${await response.text()}`)
-
-        const data = await response.text()
-        
-        // aku buruk dalam memparsing ini
-        const anu = [...data.matchAll(/^0:"(.*?)"$/gm)].map(v => v[1]).join("").replaceAll("\\n","\n").replaceAll("\\\"","\"")
-        if (!anu) throw Error(`gagal parsing pesan dari server, kemungkinan pesan kosong / error.\n\n${data}`)
-        return anu
-
+    {
+      headers: {
+        authorization: "Bearer az-chatai-key",
+        "content-type": "application/json",
+        "user-agent": "okhttp/4.9.2",
+        "x-app-version": "3.0",
+        "x-requested-with": "XMLHttpRequest",
+        "x-user-id": "$RCAnonymousID:84947a7a4141450385bfd07a66c3b5c4",
+      },
     }
+  );
+
+  let fullText = "";
+  const lines = response.data.split("\n\n").map((line) => line.substring(6));
+  for (const line of lines) {
+    if (line === "[DONE]") continue;
+    try {
+      const d = JSON.parse(line);
+      fullText += d.choices[0].delta.content || "";
+    } catch (e) {}
+  }
+
+  return fullText.trim();
 }
 
 module.exports = {
-  name: "Deepseek",
-  desc: "Ai deepseek models",
+  name: "DeepSeek",
+  desc: "AI DeepSeek untuk percakapan cerdas",
   category: "Artificial Intelligence",
-  path: "/ai/deepseek?text=",
+  path: "/ai/deepseek?question=&model=&prompt=",
+
   async run(req, res) {
-    const { text } = req.query;
+    const { question, model, prompt } = req.query;
 
-    if (!text)
-      return res.json({ status: false, error: "Text is required" });
-      
-const yourQuestion = text
-const systemPrompt = "Sekarang kamu ada ai assisten model deepseek-r1"
-const modelList = [
-    "llama",
-    "gemma",
-    "qwen-3-235b",
-    "gpt-4.1",
-    "gpt-4o",
-    "gpt-4o-mini",
-    "llama-4-scout",
-    "llama-4-maverick",
-    "deepseek-r1",
-    "qwq-32b"]
-const model = "gpt-4.1"
-const messages = [
-    {
-        "role": "user",
-        "content": "halo",
-
-    },
-    {
-        "role": "assistant",
-        "content": "Halo! Ada yang bisa saya bantu?",
-
-    },
-    {
-        "role": "user",
-        "content": yourQuestion,
-
+    if (!question) {
+      return res.json({ status: false, error: "Parameter 'question' is required" });
     }
-]
+
     try {
-      const result = await ai.generate(messages, systemPrompt, model)
-      res.json({ status: true, result });
+      const result = await deepsek(question, {
+        model: model || "deepseek-v3",
+        system_prompt: prompt || null,
+      });
+
+      res.json({
+        status: true,
+        result: result,
+      });
     } catch (err) {
-      res.status(500).json({ status: false, error: err.message });
+      res.status(500).json({
+        status: false,
+        error: err.message,
+      });
     }
-  }
+  },
 };
