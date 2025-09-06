@@ -4,7 +4,7 @@ module.exports = {
   name: "Minecraft Stalk",
   desc: "Stalk informasi akun Minecraft berdasarkan username",
   category: "Stalker",
-  path: "/stalker/minecraft",
+  path: "/stalker/minecraft?username=",
 
   async run(req, res) {
     try {
