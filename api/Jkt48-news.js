@@ -9,15 +9,17 @@ module.exports = {
 
   async run(req, res) {
     try {
+      const limit = parseInt(req.query.limit) || 5; // default ambil 5 berita
+
       const response = await fetch("https://jkt48.com/news/list?lang=id");
       const html = await response.text();
       const $ = cheerio.load(html);
 
       const berita = [];
-      $(".news-list li").slice(0, 5).each((i, el) => {
+      $(".list-news li").slice(0, limit).each((i, el) => {
         const title = $(el).find("a").text().trim();
         const link = "https://jkt48.com" + $(el).find("a").attr("href");
-        const date = $(el).find(".date").text().trim();
+        const date = $(el).find("span").text().trim();
         const icon = "https://jkt48.com" + $(el).find("img").attr("src");
 
         berita.push({ title, link, date, icon });
