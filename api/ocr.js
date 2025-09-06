@@ -6,7 +6,7 @@ module.exports = {
   category: "Tools",
   path: "/tools/ocr?url=",
   async run(req, res) {
-    const { url } = req.query;
+    const { apikey, url } = req.query;
 
     if (!url) {
       return res.json({ status: false, error: 'Url is required' });
