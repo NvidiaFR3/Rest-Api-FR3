@@ -28,13 +28,20 @@ async function deepsek(question) {
   );
 
   let fullText = "";
-  const lines = response.data.split("\n\n").map((line) => line.substring(6));
-  for (const line of lines) {
-    if (line === "[DONE]") continue;
-    try {
-      const d = JSON.parse(line);
-      fullText += d.choices[0].delta.content || "";
-    } catch (e) {}
+
+  if (typeof response.data === "object") {
+    // JSON langsung
+    fullText = response.data.choices?.[0]?.message?.content || "";
+  } else if (typeof response.data === "string") {
+    // Streaming (SSE)
+    const lines = response.data.split("\n\n").map((line) => line.substring(6));
+    for (const line of lines) {
+      if (line === "[DONE]") continue;
+      try {
+        const d = JSON.parse(line);
+        fullText += d.choices[0].delta.content || "";
+      } catch (e) {}
+    }
   }
 
   return fullText.trim();
@@ -57,6 +64,7 @@ module.exports = {
       const result = await deepsek(question);
 
       res.json({
+        creator: "FR3-NEWERA",
         status: true,
         result: result,
       });
