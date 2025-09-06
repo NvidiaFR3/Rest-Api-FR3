@@ -15,7 +15,6 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cors());
 app.use('/', express.static(path.join(__dirname, '/')));
 app.use('/', express.static(path.join(__dirname, 'ui')));
-app.use('/api', express.static(path.join(__dirname, 'api')));
 global.getBuffer = async (url, options = {}) => {
   try {
     const res = await axios({
