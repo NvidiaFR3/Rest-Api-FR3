@@ -2,7 +2,7 @@ const fetch = require("node-fetch");
 
 module.exports = {
   name: "ArtiNama",
-  desc: "Cek arti nama via Siputzx",
+  desc: "Cek arti nama kamu atau siapapun",
   category: "Random",
   path: "/random/namameaning?nama=",
 
