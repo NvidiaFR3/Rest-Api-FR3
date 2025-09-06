@@ -1,9 +1,8 @@
 const fetch = require("node-fetch");
-const cheerio = require("cheerio");
 
 module.exports = {
   name: "JKT48 News",
-  desc: "Ambil berita terbaru dari website resmi JKT48",
+  desc: "Ambil berita terbaru dari API JKT48",
   category: "Berita",
   path: "/berita/jkt48news",
 
@@ -11,22 +10,14 @@ module.exports = {
     try {
       const limit = parseInt(req.query.limit) || 5;
 
-      const response = await fetch("https://jkt48.com/news/list?lang=id");
-      const html = await response.text();
-      const $ = cheerio.load(html);
+      const response = await fetch("https://api.siputzx.my.id/api/berita/jkt48");
+      const data = await response.json();
 
-      const berita = [];
+      if (!data.status || !data.data || data.data.length === 0) {
+        return res.json({ status: false, error: "Tidak ada berita ditemukan" });
+      }
 
-      $(".news-list-container li").slice(0, limit).each((i, el) => {
-        const title = $(el).find(".desc a").text().trim();
-        const link = "https://jkt48.com" + $(el).find(".desc a").attr("href");
-        const date = $(el).find(".date").text().trim();
-        const icon = "https://jkt48.com" + $(el).find("img").attr("src");
-
-        if (title && link) {
-          berita.push({ title, link, date, icon });
-        }
-      });
+      const berita = data.data.slice(0, limit);
 
       res.json({
         creator: "FR3-NEWERA",
@@ -38,7 +29,7 @@ module.exports = {
     } catch (err) {
       res.status(500).json({
         status: false,
-        error: "Gagal mengambil data berita JKT48",
+        error: "Gagal mengambil data dari API JKT48",
         detail: err.message
       });
     }
