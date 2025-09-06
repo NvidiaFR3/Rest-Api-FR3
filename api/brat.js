@@ -1,15 +1,15 @@
 module.exports = {
   name: "Brat",
-  desc: "Brat Image generator",
+  desc: "Brat text generator",
   category: "Imagecreator",
-  path: "/imagecreator/brat?text=",
+  path: "/imagecreator/bratv?&text=",
   async run(req, res) {
     const { text } = req.query;
     if (!text) return res.json({ status: false, error: 'Missing text' });
 
-    const buffer = await getBuffer(`https://api.nekorinn.my.id/maker/brat-v2?text=${encodeURIComponent(text)}&mode=animated`);
+    const buffer = await getBuffer(`https://api.siputzx.my.id/api/m/brat?text=${encodeURIComponent(text)}&isAnimated=false&delay=500`);
     res.writeHead(200, {
-      'Content-Type': 'image/png',
+      'Content-Type': 'image/gif',
       'Content-Length': buffer.length,
     });
     res.end(buffer);
