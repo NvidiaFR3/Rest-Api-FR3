@@ -1,29 +1,18 @@
 const axios = require("axios");
 
-async function deepsek(question, { system_prompt = null, model = "deepseek-v3" } = {}) {
-  const allowedModels = ["deepseek-v3", "deepseek-r1"];
-
+async function deepsek(question) {
   if (!question) throw new Error("Question is required");
-  if (!allowedModels.includes(model)) throw new Error(`Available models: ${allowedModels.join(", ")}`);
 
   const response = await axios.post(
     "https://api.appzone.tech/v1/chat/completions",
     {
       messages: [
-        ...(system_prompt
-          ? [
-              {
-                role: "system",
-                content: [{ type: "text", text: system_prompt }],
-              },
-            ]
-          : []),
         {
           role: "user",
           content: [{ type: "text", text: question }],
         },
       ],
-      model: model,
+      model: "deepseek-v3",
       isSubscribed: true,
     },
     {
@@ -53,22 +42,19 @@ async function deepsek(question, { system_prompt = null, model = "deepseek-v3" }
 
 module.exports = {
   name: "DeepSeek",
-  desc: "AI DeepSeek untuk percakapan cerdas",
+  desc: "AI DeepSeek (default deepseek-v3) untuk percakapan",
   category: "Artificial Intelligence",
-  path: "/ai/deepseek?question=&model=&prompt=",
+  path: "/ai/deepseek?question=",
 
   async run(req, res) {
-    const { question, model, prompt } = req.query;
+    const { question } = req.query;
 
     if (!question) {
       return res.json({ status: false, error: "Parameter 'question' is required" });
     }
 
     try {
-      const result = await deepsek(question, {
-        model: model || "deepseek-v3",
-        system_prompt: prompt || null,
-      });
+      const result = await deepsek(question);
 
       res.json({
         status: true,
