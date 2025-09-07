@@ -2,7 +2,7 @@ const axios = require("axios");
 
 module.exports = [
   {
-    name: "Cek Tagihan Internet",
+    name: "Cek Tagihan Internet Indihome",
     desc: "Cek tagihan Indihome",
     category: "Tagihan",
     path: "/tagihan/indihome?nomor=",
