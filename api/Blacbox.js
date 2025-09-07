@@ -3,29 +3,38 @@ const axios = require("axios");
 async function blackboxAI(question) {
   if (!question) throw new Error("Question is required");
 
-  const response = await axios.post(
-    "https://api.blackbox.ai/v1/chat/completions", // ganti dengan endpoint Blackbox AI yang benar
-    {
-      model: "blackbox-model-v1", // ganti dengan model yang sesuai
-      messages: [
-        {
-          role: "user",
-          content: question,
-        },
-      ],
-    },
-    {
-      headers: {
-        Authorization: "Bearer sk-rpZx1090xvTTAkc2oXCzrQ", // ganti dengan token Blackbox AI Anda
-        "Content-Type": "application/json",
+  const requestBody = {
+    model: "blackbox-model-v1", // Ganti dengan model yang sesuai dari Blackbox AI
+    messages: [
+      {
+        role: "user",
+        content: question, // Pastikan ini string
       },
-    }
-  );
+    ],
+  };
 
-  // Ambil hasil response sesuai struktur Blackbox AI
-  const fullText = response.data.choices?.[0]?.message?.content || "";
+  try {
+    const response = await axios.post(
+      "https://api.blackbox.ai/v1/chat/completions", // Ganti dengan endpoint API Blackbox AI yang benar
+      requestBody,
+      {
+        headers: {
+          Authorization: "Bearer sk-rpZx1090xvTTAkc2oXCzrQ"", // Ganti dengan token API Anda
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
-  return fullText.trim();
+    // Ambil hasil response sesuai struktur API Blackbox AI
+    const fullText = response.data.choices?.[0]?.message?.content || "";
+
+    return fullText.trim();
+  } catch (err) {
+    // Logging error detail untuk debugging
+    console.error("Request payload:", JSON.stringify(requestBody, null, 2));
+    console.error("Response error:", err.response?.data || err.message);
+    throw new Error(err.response?.data?.error || err.message);
+  }
 }
 
 module.exports = {
