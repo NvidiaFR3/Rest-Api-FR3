@@ -19,7 +19,7 @@ async function blackboxAI(question) {
       requestBody,
       {
         headers: {
-          Authorization: "Bearer sk-rpZx1090xvTTAkc2oXCzrQ"", // Ganti dengan token API Anda
+          Authorization: "Bearer sk-rpZx1090xvTTAkc2oXCzrQ", // Ganti dengan token API Anda
           "Content-Type": "application/json",
         },
       }
