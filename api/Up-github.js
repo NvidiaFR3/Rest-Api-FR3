@@ -9,7 +9,7 @@ async function createRepo(username, repo, token) {
   const url = "https://api.github.com/user/repos";
   const response = await axios.post(
     url,
-    { name: repo, private: true }, // otomatis private
+    { name: repo, private: true }, // langsung private
     { headers: { Authorization: `token ${token}`, "User-Agent": username } }
   );
   return response.data;
@@ -32,7 +32,7 @@ async function uploadFile(username, repo, token, filePath, rootPath) {
 }
 
 // Upload semua file
-async function uploadAll(username, repo, token, rootPath, option) {
+async function uploadAll(username, repo, token, rootPath) {
   const walk = async (dir) => {
     const files = fs.readdirSync(dir);
     for (const file of files) {
@@ -44,17 +44,7 @@ async function uploadAll(username, repo, token, rootPath, option) {
       }
     }
   };
-
-  if (option === "onlysrc") {
-    const srcPath = path.join(rootPath, "src");
-    if (fs.existsSync(srcPath)) {
-      await walk(srcPath);
-    } else {
-      throw new Error("Folder src tidak ditemukan di zip");
-    }
-  } else {
-    await walk(rootPath);
-  }
+  await walk(rootPath);
 }
 
 module.exports = [
@@ -62,10 +52,10 @@ module.exports = [
     name: "Github Uploader",
     desc: "Create private repo & upload project from ZIP",
     category: "Tools",
-    path: "/tools/github-uploader?username=&repo=&token=&linkzip=&option=",
+    path: "/tools/github-uploader?username=&repo=&token=&linkzip=",
 
     async run(req, res) {
-      const { username, repo, token, linkzip, option = "full" } = req.query;
+      const { username, repo, token, linkzip } = req.query;
       if (!username || !repo || !token || !linkzip) {
         return res.json({ status: false, error: "Wajib isi username, repo, token, linkzip" });
       }
@@ -90,14 +80,13 @@ module.exports = [
         // Buat Repo (otomatis private)
         await createRepo(username, repo, token);
 
-        // Upload File
-        await uploadAll(username, repo, token, extractPath, option);
+        // Upload File (semua isi zip)
+        await uploadAll(username, repo, token, extractPath);
 
         res.json({
           status: true,
-          message: "Private repo berhasil dibuat & file berhasil diupload",
+          message: "Private repo berhasil dibuat & semua file berhasil diupload",
           repo_url: `https://github.com/${username}/${repo}`,
-          uploaded_option: option,
           private: true,
         });
       } catch (err) {
