@@ -6,21 +6,28 @@ const os = require("os");
 
 // Buat repo baru (otomatis private)
 async function createRepo(username, repo, token) {
-  const url = "https://api.github.com/user/repos";
-  const response = await axios.post(
-    url,
-    { name: repo, private: true }, // langsung private
-    { headers: { Authorization: `token ${token}`, "User-Agent": username } }
-  );
-  return response.data;
+  try {
+    const url = "https://api.github.com/user/repos";
+    const response = await axios.post(
+      url,
+      { name: repo, private: true }, // repo private
+      { headers: { Authorization: `token ${token}`, "User-Agent": username } }
+    );
+    return response.data;
+  } catch (err) {
+    if (err.response && err.response.status === 422) {
+      throw new Error(`Repository '${repo}' sudah ada di akun ${username}`);
+    }
+    throw err;
+  }
 }
 
-// Upload satu file
+// Upload file ke repo
 async function uploadFile(username, repo, token, filePath, rootPath) {
   const content = fs.readFileSync(filePath).toString("base64");
   const relativePath = path.relative(rootPath, filePath).replace(/\\/g, "/");
-  const url = `https://api.github.com/repos/${username}/${repo}/contents/${relativePath}`;
 
+  const url = `https://api.github.com/repos/${username}/${repo}/contents/${relativePath}`;
   await axios.put(
     url,
     {
@@ -31,7 +38,7 @@ async function uploadFile(username, repo, token, filePath, rootPath) {
   );
 }
 
-// Upload semua file
+// Rekursif upload semua file
 async function uploadAll(username, repo, token, rootPath) {
   const walk = async (dir) => {
     const files = fs.readdirSync(dir);
@@ -57,14 +64,21 @@ module.exports = [
     async run(req, res) {
       const { username, repo, token, linkzip } = req.query;
       if (!username || !repo || !token || !linkzip) {
-        return res.json({ status: false, error: "Wajib isi username, repo, token, linkzip" });
+        return res.json({
+          status: false,
+          error: "Wajib isi username, repo, token, dan linkzip",
+        });
       }
 
       try {
         // Download ZIP
         const zipPath = path.join(os.tmpdir(), `repo_${Date.now()}.zip`);
         const writer = fs.createWriteStream(zipPath);
-        const response = await axios({ url: linkzip, method: "GET", responseType: "stream" });
+        const response = await axios({
+          url: linkzip,
+          method: "GET",
+          responseType: "stream",
+        });
         response.data.pipe(writer);
         await new Promise((resolve, reject) => {
           writer.on("finish", resolve);
@@ -77,20 +91,22 @@ module.exports = [
         const zip = new AdmZip(zipPath);
         zip.extractAllTo(extractPath, true);
 
-        // Buat Repo (otomatis private)
+        // Buat Repo
         await createRepo(username, repo, token);
 
-        // Upload File (semua isi zip)
+        // Upload File
         await uploadAll(username, repo, token, extractPath);
 
         res.json({
           status: true,
           message: "Private repo berhasil dibuat & semua file berhasil diupload",
           repo_url: `https://github.com/${username}/${repo}`,
-          private: true,
         });
       } catch (err) {
-        res.status(500).json({ status: false, error: err.message });
+        res.status(500).json({
+          status: false,
+          error: err.message,
+        });
       }
     },
   },
