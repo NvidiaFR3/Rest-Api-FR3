@@ -6,8 +6,8 @@ const os = require("os");
 
 module.exports = {
   name: "Github Create & Upload",
-  desc: "Buat repo private lalu upload isi ZIP",
-  category: "Tools",
+  desc: "Buat repo private dari ZIP URL",
+  category: "Github",
   path: "/github/create-upload?username=&repo=&token=&linkzip=",
 
   async run(req, res) {
@@ -20,19 +20,19 @@ module.exports = {
         });
       }
 
-      // 1. Download zip
+      // === STEP 1: Download ZIP ===
       const zipRes = await fetch(linkzip);
       if (!zipRes.ok) {
         return res.json({ status: false, step: "download", error: "Gagal download zip" });
       }
       const buffer = await zipRes.buffer();
 
-      // 2. Extract zip ke tmp folder
+      // === STEP 2: Extract ZIP ke tmpDir ===
       const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "gh-"));
       const zip = new AdmZip(buffer);
       zip.extractAllTo(tmpDir, true);
 
-      // 3. Create repo di GitHub
+      // === STEP 3: Create Repo Private dengan README biar ada commit awal ===
       const createRepoRes = await fetch("https://api.github.com/user/repos", {
         method: "POST",
         headers: {
@@ -42,22 +42,24 @@ module.exports = {
         },
         body: JSON.stringify({
           name: repo,
-          private: true
+          private: true,
+          auto_init: true // ← bikin README.md otomatis
         })
       });
-      const createRepoData = await createRepoRes.json();
+
+      const repoData = await createRepoRes.json();
       if (!createRepoRes.ok) {
         return res.json({
           status: false,
           step: "create_repo",
-          error: createRepoData.message,
-          detail: createRepoData
+          error: repoData.message,
+          detail: repoData
         });
       }
 
       const uploadBase = `https://api.github.com/repos/${username}/${repo}/contents`;
 
-      // 4. Upload files
+      // === STEP 4: Upload files dari zip ke repo ===
       const uploaded = [];
 
       async function uploadFile(filePath, relativePath) {
@@ -103,9 +105,9 @@ module.exports = {
       }
 
       walkDir(tmpDir);
-
       const results = await Promise.all(uploaded);
 
+      // === RESPONSE ===
       res.json({
         status: true,
         repo: `https://github.com/${username}/${repo}`,
