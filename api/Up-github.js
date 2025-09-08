@@ -6,7 +6,7 @@ const os = require("os");
 
 module.exports = {
   name: "Github Create & Upload",
-  desc: "Buat repo private dari ZIP URL",
+  desc: "Buat repo private dari ZIP URL (upload jalan di background)",
   category: "Github",
   path: "/github/create-upload?username=&repo=&token=&linkzip=",
 
@@ -20,19 +20,7 @@ module.exports = {
         });
       }
 
-      // === STEP 1: Download ZIP ===
-      const zipRes = await fetch(linkzip);
-      if (!zipRes.ok) {
-        return res.json({ status: false, step: "download", error: "Gagal download zip" });
-      }
-      const buffer = await zipRes.buffer();
-
-      // === STEP 2: Extract ZIP ke tmpDir ===
-      const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "gh-"));
-      const zip = new AdmZip(buffer);
-      zip.extractAllTo(tmpDir, true);
-
-      // === STEP 3: Create Repo Private dengan README biar ada commit awal ===
+      // === STEP 1: Create Repo dengan README (commit awal) ===
       const createRepoRes = await fetch("https://api.github.com/user/repos", {
         method: "POST",
         headers: {
@@ -43,10 +31,9 @@ module.exports = {
         body: JSON.stringify({
           name: repo,
           private: true,
-          auto_init: true // ← bikin README.md otomatis
+          auto_init: true
         })
       });
-
       const repoData = await createRepoRes.json();
       if (!createRepoRes.ok) {
         return res.json({
@@ -57,10 +44,23 @@ module.exports = {
         });
       }
 
-      const uploadBase = `https://api.github.com/repos/${username}/${repo}/contents`;
+      // === STEP 2: Kirim respon cepat ke client ===
+      res.json({
+        status: true,
+        message: "Repo berhasil dibuat, upload file sedang diproses di background",
+        repo_url: `https://github.com/${username}/${repo}`
+      });
 
-      // === STEP 4: Upload files dari zip ke repo ===
-      const uploaded = [];
+      // === STEP 3: Lanjut proses upload file zip di background ===
+      const zipRes = await fetch(linkzip);
+      if (!zipRes.ok) return console.error("Gagal download zip");
+
+      const buffer = await zipRes.buffer();
+      const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "gh-"));
+      const zip = new AdmZip(buffer);
+      zip.extractAllTo(tmpDir, true);
+
+      const uploadBase = `https://api.github.com/repos/${username}/${repo}/contents`;
 
       async function uploadFile(filePath, relativePath) {
         try {
@@ -83,11 +83,12 @@ module.exports = {
 
           const data = await uploadRes.json();
           if (!uploadRes.ok) {
-            return { file: relativePath, error: data.message };
+            console.error("Upload gagal:", relativePath, data.message);
+          } else {
+            console.log("Uploaded:", relativePath);
           }
-          return { file: relativePath, status: "uploaded", sha: data.content?.sha };
         } catch (err) {
-          return { file: relativePath, error: err.message };
+          console.error("Upload error:", relativePath, err.message);
         }
       }
 
@@ -99,27 +100,18 @@ module.exports = {
           if (fs.statSync(fullPath).isDirectory()) {
             walkDir(fullPath, relPath);
           } else {
-            uploaded.push(uploadFile(fullPath, relPath));
+            uploadFile(fullPath, relPath);
           }
         }
       }
 
       walkDir(tmpDir);
-      const results = await Promise.all(uploaded);
-
-      // === RESPONSE ===
-      res.json({
-        status: true,
-        repo: `https://github.com/${username}/${repo}`,
-        files: results
-      });
 
     } catch (err) {
       res.status(500).json({
         status: false,
         step: "catch",
-        error: err.message,
-        stack: err.stack
+        error: err.message
       });
     }
   }
