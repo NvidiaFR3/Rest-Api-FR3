@@ -6,7 +6,7 @@ const os = require("os");
 
 module.exports = {
   name: "Github Create & Upload",
-  desc: "Buat repository private lalu upload file dari zip link",
+  desc: "Buat repository private dan upload isi ZIP",
   category: "Github",
   path: "/github/create-upload?username=&repo=&token=&linkzip=",
 
@@ -16,65 +16,74 @@ module.exports = {
       if (!username || !repo || !token || !linkzip) {
         return res.json({
           status: false,
-          error: "Parameter 'username', 'repo', 'token', dan 'linkzip' wajib diisi"
+          error: "Wajib isi 'username', 'repo', 'token', dan 'linkzip'"
         });
       }
 
-      // 1. Download ZIP
+      // STEP 1: Download zip
       const zipRes = await fetch(linkzip);
       if (!zipRes.ok) {
-        return res.json({ status: false, error: "Gagal download zip" });
+        return res.json({ status: false, step: "download", error: "Gagal download ZIP" });
       }
       const buffer = await zipRes.buffer();
 
-      // 2. Ekstrak ZIP
-      const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "upload-"));
+      // STEP 2: Extract zip
+      const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "gh-"));
       const zip = new AdmZip(buffer);
       zip.extractAllTo(tmpDir, true);
 
-      // 3. Create repo di GitHub (auto private)
+      // STEP 3: Create repo
       const createRepoRes = await fetch("https://api.github.com/user/repos", {
         method: "POST",
         headers: {
-          "Authorization": `token ${token}`,
+          Authorization: `token ${token}`,
           "Content-Type": "application/json",
-          "User-Agent": "my-bot"
+          "User-Agent": "gh-bot"
         },
         body: JSON.stringify({
           name: repo,
           private: true
         })
       });
-
       const createRepoData = await createRepoRes.json();
       if (!createRepoRes.ok) {
-        return res.json({ status: false, error: createRepoData.message });
+        return res.json({
+          status: false,
+          step: "create_repo",
+          error: createRepoData.message,
+          detail: createRepoData
+        });
       }
 
-      const uploadUrl = `https://api.github.com/repos/${username}/${repo}/contents`;
+      const uploadBase = `https://api.github.com/repos/${username}/${repo}/contents`;
 
-      // 4. Upload file satu per satu
+      // STEP 4: Upload files
+      const uploaded = [];
+
       async function uploadFile(filePath, relativePath) {
         const content = fs.readFileSync(filePath);
-        const b64 = content.toString("base64");
+        const b64 = Buffer.from(content).toString("base64");
 
-        const url = `${uploadUrl}/${relativePath}`;
+        const url = `${uploadBase}/${relativePath.replace(/\\/g, "/")}`;
         const uploadRes = await fetch(url, {
           method: "PUT",
           headers: {
-            "Authorization": `token ${token}`,
+            Authorization: `token ${token}`,
             "Content-Type": "application/json",
-            "User-Agent": "my-bot"
+            "User-Agent": "gh-bot"
           },
           body: JSON.stringify({
             message: `Add ${relativePath}`,
             content: b64
           })
         });
-        return uploadRes.json();
-      }
 
-      const uploaded = [];
+        const uploadData = await uploadRes.json();
+        if (!uploadRes.ok) {
+          return { file: relativePath, error: uploadData.message, detail: uploadData };
+        }
+        return { file: relativePath, status: "uploaded", sha: uploadData.content?.sha };
+      }
 
       function walkDir(dir, base = "") {
         const files = fs.readdirSync(dir);
@@ -90,19 +99,21 @@ module.exports = {
       }
 
       walkDir(tmpDir);
+
       const results = await Promise.all(uploaded);
 
       res.json({
         status: true,
         repo: `https://github.com/${username}/${repo}`,
-        uploaded: results.map(r => ({ path: r.content?.path, sha: r.content?.sha }))
+        files_uploaded: results
       });
 
     } catch (err) {
       res.status(500).json({
         status: false,
-        error: "Gagal create & upload repo",
-        detail: err.message
+        step: "catch",
+        error: err.message,
+        stack: err.stack
       });
     }
   }
