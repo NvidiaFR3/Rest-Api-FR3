@@ -7,19 +7,6 @@ const fs = require('fs');
 // Optional: register a nicer font if available in your server
 // registerFont(path.join(__dirname, 'fonts', 'SF-Pro-Text-Regular.ttf'), { family: 'SFPro' });
 
-/**
- * Query parameters:
- *  - text (string, required) : quote text
- *  - sender (string, optional) : display name above bubble (default: "")
- *  - time (string, optional) : time string to show (default: current HH:MM)
- *  - reactions (comma sep emojis, optional) : e.g. "👍,❤️,😂"
- *  - width (number, optional) : output width in px (default 1240)
- *  - height (number, optional) : output height in px (default 2680)
- *  - bg (url optional) : background image URL (will be blurred)
- *
- * Response: image/png binary
- */
-
 function wrapText(ctx, text, maxWidth) {
   const words = text.split(' ');
   const lines = [];
@@ -51,8 +38,8 @@ async function fetchImageSafe(url) {
 
 module.exports = {
   name: "IQC iPhone Quote",
-  desc: "Generate iPhone-style quote image (dark chat bubble) from text",
-  category: "ImageCreator",
+  desc: "Generate iPhone style quote image from text",
+  category: "Imagecreator",
   path: "/imagecreator/iqc?text=&sender=&time=&reactions=&bg=&width=&height=",
 
   async run(req, res) {
