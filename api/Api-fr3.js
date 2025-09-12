@@ -2,7 +2,7 @@ const axios = require("axios");
 
 module.exports = {
   name: "Get Source Premium",
-  desc: "Redirect user ke GitHub repo asli jika apikey valid",
+  desc: "Ambil isi source code dari GitHub Private Repo",
   category: "Premium",
   path: "/premium/getsource?apikey=",
 
@@ -16,10 +16,33 @@ module.exports = {
       });
     }
 
-    const owner = "NvidiaFR3";
-    const repo = "Rest-Api-FR3";
-    const githubUrl = `https://github.com/${owner}/${repo}`;
+    try {
+      const owner = "NvidiaFR3";
+      const repo = "Rest-Api-FR3";
+      const path = "";
+      const token = process.env.GITHUB_TOKEN;
 
-    return res.redirect(githubUrl);
+      const response = await axios.get(
+        `https://api.github.com/repos/${owner}/${repo}/contents/${path}`,
+        {
+          headers: {
+            Authorization: `token ${token}`,
+            Accept: "application/vnd.github.v3+json"
+          }
+        }
+      );
+
+      return res.json({
+        status: true,
+        repo: `${owner}/${repo}`,
+        files: response.data
+      });
+    } catch (err) {
+      return res.status(500).json({
+        status: false,
+        error: "Gagal mengambil data dari GitHub",
+        detail: err.message
+      });
+    }
   }
 };
