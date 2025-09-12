@@ -13,6 +13,7 @@ app.set("json spaces", 2);
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cors());
+
 global.getBuffer = async (url, options = {}) => {
   try {
     const res = await axios({
@@ -47,7 +48,15 @@ global.fetchJson = async (url, options = {}) => {
   }
 };
 
-global.apikey = process.env.APIKEY || null;
+// 🔑 Load APIKEY dari .env, support format ["",""] (JSON array)
+let apiKeyRaw = process.env.APIKEY || "[]";
+try {
+  global.apikey = JSON.parse(apiKeyRaw); // kalau valid JSON
+} catch (e) {
+  // fallback kalau user isi koma
+  global.apikey = apiKeyRaw.split(",").map(k => k.replace(/["'\[\]]/g, "").trim());
+}
+
 global.totalreq = 0;
 const settings = {
   creatorName: "FR3-NEWERA",
@@ -126,9 +135,9 @@ app.get('/endpoints', (req, res) => {
 
 app.get('/', (req, res) => {
   try {
-  res.sendFile(path.join(__dirname, 'index.html'));
+    res.sendFile(path.join(__dirname, 'index.html'));
   } catch (err) {
-  console.log(err)
+    console.log(err)
   }
 });
 
