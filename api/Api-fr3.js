@@ -1,16 +1,16 @@
-const axios = require("axios");
+const { exec } = require("child_process");
 const fs = require("fs");
 const path = require("path");
+const archiver = require("archiver");
 
 module.exports = {
-  name: "Download Premium Repo",
-  desc: "Generate link download repo private GitHub (ZIP)",
+  name: "Download Repo SSH",
+  desc: "Download private repo via SSH clone",
   category: "Premium",
-  path: "/premium/github-download?apikey=",
+  path: "/premium/github-ssh-download?apikey=",
 
   async run(req, res) {
     const { apikey } = req.query;
-
     if (!apikey || !global.apikey.includes(apikey)) {
       return res.json({
         status: false,
@@ -19,49 +19,43 @@ module.exports = {
       });
     }
 
+    const repo = "git@github.com:NvidiaFR3/Rest-Api-FR3.git";
+    const repoName = "Rest-Api-FR3";
+    const cloneDir = path.join(__dirname, repoName);
+    const zipPath = path.join(__dirname, `${repoName}.zip`);
+
     try {
-      const owner = "NvidiaFR3";
-      const repo = "Rest-Api-FR3";
-      const branch = "main";
-      const token = process.env.GITHUB_TOKEN;
+      // Hapus dulu kalau ada sisa folder lama
+      if (fs.existsSync(cloneDir)) fs.rmSync(cloneDir, { recursive: true });
+      if (fs.existsSync(zipPath)) fs.unlinkSync(zipPath);
 
-      const url = `https://api.github.com/repos/${owner}/${repo}/zipball/${branch}`;
-      const zipPath = path.join(__dirname, `${repo}.zip`);
-
-      // Download repo ke file lokal
-      const response = await axios({
-        url,
-        method: "GET",
-        responseType: "stream",
-        headers: {
-          Authorization: `token ${token}`,
-          Accept: "application/vnd.github.v3+json"
+      // Clone via SSH
+      exec(`git clone ${repo} ${cloneDir}`, (err) => {
+        if (err) {
+          return res
+            .status(500)
+            .json({ status: false, error: "Gagal clone repo", detail: err.message });
         }
-      });
 
-      const writer = fs.createWriteStream(zipPath);
-      response.data.pipe(writer);
+        // Zip hasil clone
+        const output = fs.createWriteStream(zipPath);
+        const archive = archiver("zip", { zlib: { level: 9 } });
+        archive.pipe(output);
+        archive.directory(cloneDir, false);
+        archive.finalize();
 
-      writer.on("finish", () => {
-        const downloadLink = `/downloads/${repo}.zip`;
-        res.json({
-          status: true,
-          message: "Silakan download repo",
-          download: downloadLink
-        });
-      });
-
-      writer.on("error", (err) => {
-        res.status(500).json({
-          status: false,
-          error: "Gagal menyimpan file ZIP",
-          detail: err.message
+        output.on("close", () => {
+          res.json({
+            status: true,
+            message: "Silakan download repo",
+            download: `/downloads/${repoName}.zip`
+          });
         });
       });
     } catch (err) {
-      return res.status(500).json({
+      res.status(500).json({
         status: false,
-        error: "Gagal fetch repo dari GitHub",
+        error: "Gagal proses SSH repo",
         detail: err.message
       });
     }
