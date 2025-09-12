@@ -1,10 +1,10 @@
 const axios = require("axios");
 
 module.exports = {
-  name: "Get Source Premium",
-  desc: "Ambil isi source code dari GitHub Private Repo",
+  name: "Download Source Premium",
+  desc: "Download repo private GitHub dalam format ZIP",
   category: "Premium",
-  path: "/premium/getsource?apikey=",
+  path: "/premium/download?apikey=",
 
   async run(req, res) {
     const { apikey } = req.query;
@@ -19,28 +19,31 @@ module.exports = {
     try {
       const owner = "NvidiaFR3";
       const repo = "Rest-Api-FR3";
-      const path = "";
+      const branch = "main"; // bisa ubah kalau mau branch lain
       const token = process.env.GITHUB_TOKEN;
 
       const response = await axios.get(
-        `https://api.github.com/repos/${owner}/${repo}/contents/${path}`,
+        `https://api.github.com/repos/${owner}/${repo}/zipball/${branch}`,
         {
           headers: {
             Authorization: `token ${token}`,
             Accept: "application/vnd.github.v3+json"
-          }
+          },
+          responseType: "arraybuffer" // supaya hasilnya file binary ZIP
         }
       );
 
-      return res.json({
-        status: true,
-        repo: `${owner}/${repo}`,
-        files: response.data
-      });
+      res.setHeader("Content-Type", "application/zip");
+      res.setHeader(
+        "Content-Disposition",
+        `attachment; filename=${repo}-${branch}.zip`
+      );
+
+      return res.send(response.data);
     } catch (err) {
       return res.status(500).json({
         status: false,
-        error: "Gagal mengambil data dari GitHub",
+        error: "Gagal download ZIP dari GitHub",
         detail: err.message
       });
     }
