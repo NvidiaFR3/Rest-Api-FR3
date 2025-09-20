@@ -1,114 +1,73 @@
-// api/saweria.js
-// Requires: npm i saweria-createqr
 const { SumshiiySawer } = require('saweria-createqr');
 
 module.exports = [
-  // CREATE PAYMENT
   {
-    name: "Saweria Create Payment",
-    desc: "Buat payment QR di Saweria (createPaymentQr)",
-    category: "Payment",
-    path: "/payment/saweria/create?username=&email=&password=&amount=",
-
+    name: "Create Saweria Payment",
+    desc: "Buat pembayaran Saweria QR (Expired 10 menit) + Auto Cek Status",
+    category: "Premium",
+    path: "/saweria/create?username=&email=&password=&amount=",
     async run(req, res) {
+      const { username, email, password, amount } = req.query;
+      if (!username || !email || !password || !amount) {
+        return res.json({ status: false, error: "Parameter kurang lengkap" });
+      }
+
       try {
-        const q = req.query || {};
-        let { username, email, password, amount } = q;
-
-        // Basic validation & auto-correct
-        username = (username || '').toString().trim();
-        email = (email || '').toString().trim();
-        password = (password || '').toString();
-        amount = amount !== undefined ? parseInt(amount, 10) : NaN;
-
-        if (!username) return res.json({ status: false, error: "Parameter 'username' wajib diisi" });
-        if (!email) return res.json({ status: false, error: "Parameter 'email' wajib diisi" });
-        if (!password) return res.json({ status: false, error: "Parameter 'password' wajib diisi" });
-        if (!Number.isFinite(amount) || amount <= 0) return res.json({ status: false, error: "Parameter 'amount' wajib berupa angka > 0" });
-
-        // instantiate and login
         const sawer = new SumshiiySawer({ username, email, password });
         await sawer.login();
 
-        // default duration in minutes (you can change if needed)
-        const DURATION_MINUTES = 30;
+        // Buat QR expired 10 menit
+        const payment = await sawer.createPaymentQr(Number(amount), 10);
+        
+        // Polling otomatis setiap 7 detik
+        const trxId = payment.trx_id;
+        let counter = 0;
+        const interval = setInterval(async () => {
+          counter++;
+          try {
+            const status = await sawer.cekpayment(trxId);
+            console.log(`[Polling ${counter}]`, status.status);
 
-        // create payment
-        const payment = await sawer.createPaymentQr(amount, DURATION_MINUTES);
+            if (status.status === "Paid" || status.status === "Expired") {
+              console.log(`❌ Stop Polling - Status: ${status.status}`);
+              clearInterval(interval);
+            }
+          } catch (err) {
+            console.error("Error polling:", err.message);
+            clearInterval(interval);
+          }
+        }, 7000);
 
-        // normalize response: try to match example structure if possible
-        const result = {
+        res.json({
           status: true,
-          data: payment || {},
-          message: "Create payment berhasil",
-        };
-
-        return res.json(result);
-      } catch (err) {
-        // try to make error message friendly
-        return res.status(500).json({
-          status: false,
-          error: "Gagal membuat payment Saweria",
-          detail: err && err.message ? err.message : String(err)
+          message: "QR Saweria berhasil dibuat. Status dipantau otomatis tiap 7 detik.",
+          result: payment
         });
+
+      } catch (err) {
+        res.status(500).json({ status: false, error: err.message });
       }
     }
   },
 
-  // CHECK STATUS
   {
-    name: "Saweria Check Payment Status",
-    desc: "Cek status transaksi Saweria (cekPaymentV1 / cekpayment)",
-    category: "Payment",
-    path: "/payment/saweria/status?username=&email=&password=&trxid=",
-
+    name: "Cek Status Saweria Payment",
+    desc: "Cek status transaksi Saweria berdasarkan trx_id",
+    category: "Premium",
+    path: "/saweria/status?username=&email=&password=&trxid=",
     async run(req, res) {
+      const { username, email, password, trxid } = req.query;
+      if (!username || !email || !password || !trxid) {
+        return res.json({ status: false, error: "Parameter kurang lengkap" });
+      }
+
       try {
-        const q = req.query || {};
-        let { username, email, password, trxid } = q;
-
-        username = (username || '').toString().trim();
-        email = (email || '').toString().trim();
-        password = (password || '').toString();
-        trxid = (trxid || '').toString().trim();
-
-        if (!username) return res.json({ status: false, error: "Parameter 'username' wajib diisi" });
-        if (!email) return res.json({ status: false, error: "Parameter 'email' wajib diisi" });
-        if (!password) return res.json({ status: false, error: "Parameter 'password' wajib diisi" });
-        if (!trxid) return res.json({ status: false, error: "Parameter 'trxid' wajib diisi (trx id dari create)" });
-
         const sawer = new SumshiiySawer({ username, email, password });
         await sawer.login();
-
-        // Try to call available check method(s)
-        let statusResp = null;
-        if (typeof sawer.cekPaymentV1 === 'function') {
-          statusResp = await sawer.cekPaymentV1(trxid);
-        } else if (typeof sawer.cekpayment === 'function') {
-          // some libs use different casing
-          statusResp = await sawer.cekpayment(trxid);
-        } else if (typeof sawer.cekPayment === 'function') {
-          statusResp = await sawer.cekPayment(trxid);
-        } else {
-          // fallback: try generic method name
-          if (typeof sawer['cekPaymentV1'] === 'function') {
-            statusResp = await sawer['cekPaymentV1'](trxid);
-          } else {
-            throw new Error("Library Saweria tidak menyediakan method cekPaymentV1 / cekpayment pada versi ini");
-          }
-        }
-
-        return res.json({
-          status: true,
-          data: statusResp || {},
-          message: "Cek status berhasil"
-        });
+        const status = await sawer.cekpayment(trxid);
+        res.json({ status: true, result: status });
       } catch (err) {
-        return res.status(500).json({
-          status: false,
-          error: "Gagal cek status Saweria",
-          detail: err && err.message ? err.message : String(err)
-        });
+        res.status(500).json({ status: false, error: err.message });
       }
     }
   }
