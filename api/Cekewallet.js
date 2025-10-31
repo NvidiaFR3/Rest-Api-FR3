@@ -31,9 +31,9 @@ async function checkSingleEwallet(ewallet, accNum) {
 }
 module.exports = [
   {
-    name: "E-Wallet Account Inquiry",
+    name: "Ewallet Account Inquiry",
     desc: "Checks an account number against OVO, DANA, GoPay, LinkAja, and ShopeePay.",
-    category: "E-Wallet",
+    category: "Tools",
     path: "/ewallet/check?account_number=",
     async run(req, res) {
       const { account_number } = req.query;
@@ -58,11 +58,11 @@ module.exports = [
         const results = await Promise.all(checkPromises);
         res.json({
           status: true,
-          message: "E-wallet inquiry successful",
+          message: "Ewallet inquiry successful",
           data: results
         });
       } catch (error) {
-        console.error("E-Wallet Scrape Internal Error:", error.message);
+        console.error("Ewallet Scrape Internal Error:", error.message);
         return res.status(500).json({
           status: false,
           error: "An internal error occurred during the e-wallet scrape."
