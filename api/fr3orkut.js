@@ -9,8 +9,8 @@ class OrderKuota {
   static API_URL_ORDER = 'https://app.orderkuota.com/api/v2/order';
   static HOST = 'app.orderkuota.com';
   static USER_AGENT = 'okhttp/4.12.0';
-  static APP_VERSION_NAME = '25.08.11';
-  static APP_VERSION_CODE = '250811';
+  static APP_VERSION_NAME = '25.10.29';
+  static APP_VERSION_CODE = '251029';
   static APP_REG_ID = 'cUx8YuXhS5yLKPOaY6_zv_:APA91bH7c1pEuuxtYnTgJAegkbDkj8cicnpkEEQkp0v2yr3bEfWKqIYCuNkwX_VdUjQuJ3UpP75mb72I3kowTpXGomHsspEfIaNnVabdrCEeHFG2IEWWLPU';
 
   constructor(username = null, authToken = null) {
@@ -60,7 +60,6 @@ class OrderKuota {
       app_reg_id: OrderKuota.APP_REG_ID,
     });
     
-    // Use new endpoint structure
     const endpoint = userId ? 
       `${OrderKuota.API_URL}/qris/mutasi/${userId}` : 
       `${OrderKuota.API_URL}/get`;
