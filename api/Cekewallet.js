@@ -42,6 +42,7 @@ module.exports = {
 
       const result = await checkAccount(bank.toLowerCase(), nomor);
       res.json({
+        creator: "FR3-NEWERA",
         status: true,
         result: result.data || result
       });
