@@ -25,7 +25,9 @@ module.exports = {
   category: "Tools",
   path: "/tools/cek-rekening?bank=&nomor=",
   async run(req, res) {
-    const { bank, nomor } = req.query;
+    try {
+      const { bank, nomor } = req.query;
+
       if (!bank || !nomor) {
         return res.json({ status: false, error: "Parameter 'bank' dan 'nomor' diperlukan!" });
       }
@@ -41,15 +43,19 @@ module.exports = {
       }
 
       const result = await checkAccount(bank.toLowerCase(), nomor);
+      
       res.json({
-        creator: "FR3-NEWERA",
         status: true,
+        creator: "FR3 NEWERA",
         result: result.data || result
       });
 
     } catch (err) {
       console.error("Error Cek Rekening:", err.message);
-      res.json({ status: false, error: "Terjadi kesalahan pada server atau API target." });
+      res.json({ 
+        status: false, 
+        error: "Terjadi kesalahan pada server atau API target." 
+      });
     }
   },
 };
