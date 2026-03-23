@@ -133,8 +133,8 @@ app.get('/', (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(chalk.bgGreen.black(` 🚀 Server is running on port ${PORT} `));
-  console.log(chalk.bgCyan.black(` 📦 Total Routes Loaded: ${totalRoutes} `));
+  console.log(chalk.bgGreen.black(` Server is running on port ${PORT} `));
+  console.log(chalk.bgCyan.black(` Total Routes Loaded: ${totalRoutes} `));
 });
 
 module.exports = app;
