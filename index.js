@@ -48,21 +48,12 @@ global.fetchJson = async (url, options = {}) => {
   }
 };
 
-// 🔑 Load APIKEY dari .env, support format ["",""] (JSON array)
-let apiKeyRaw = process.env.APIKEY || "[]";
-try {
-  global.apikey = JSON.parse(apiKeyRaw); // kalau valid JSON
-} catch (e) {
-  // fallback kalau user isi koma
-  global.apikey = apiKeyRaw.split(",").map(k => k.replace(/["'\[\]]/g, "").trim());
-}
-
 global.totalreq = 0;
 const settings = {
   creatorName: "FR3-NEWERA",
   whatsappLink: "https://t.me/fr3newera",
   apiTitle: "FR3 Api's",
-  githubLink: "https://NvidiaFR3",
+  githubLink: "https://github.com/fr3newera",
   instagramLink: "https://instagram.com/rendyindrapratama3"
 };
 
