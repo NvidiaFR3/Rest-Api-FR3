@@ -124,82 +124,90 @@ async function createQRIS(amount, codeqr) {
   }
 }
 
-module.exports = {
-  name: "Order Kuota",
-  desc: "API Integrasi OrderKuota (OTP, Token, Mutasi, WD)",
-  category: "Payment Gateway",
-  path: "/pg/orderkuota?action=&username=&password=",
-  async run(req, res) {
-    try {
-      // Menarik semua query yang dibutuhkan
-      const { action, username, password, otp, token, amount, codeqr } = req.query;
-
-      if (!action) {
-        return res.json({ 
-          status: false, 
-          error: "Parameter 'action' diperlukan!", 
-          available_actions: ["getotp", "gettoken", "mutasiqr", "profile", "wdqr", "createpayment"] 
-        });
-      }
-
-      // --- ROUTING BERDASARKAN ACTION ---
-
-      if (action === "getotp") {
-        if (!username || !password) return res.json({ status: false, error: "Parameter 'username' dan 'password' diperlukan" });
+module.exports = [
+  {
+    name: "Get OTP",
+    desc: "Request OTP untuk login Orderkuota",
+    category: "Payment Gateway",
+    path: "/orderkuota/getotp?username=&password=",
+    async run(req, res) {
+      const { username, password } = req.query;
+      if (!username || !password) return res.json({ status: false, error: 'Missing username or password' });
+      try {
         const ok = new OrderKuota();
         const login = await ok.loginRequest(username, password);
-        if (!login?.results) return res.json({ status: false, error: login?.error || "Login gagal", raw: login });
-        return res.json({ status: true, result: login.results });
+        res.json({ status: true, creator: "FR3 NEWERA", result: login.results || login });
+      } catch (err) {
+        res.json({ status: false, error: err.message });
       }
-
-      if (action === "gettoken") {
-        if (!username || !otp) return res.json({ status: false, error: "Parameter 'username' dan 'otp' diperlukan" });
-        const ok = new OrderKuota();
-        const login = await ok.getAuthToken(username, otp);
-        if (!login?.results) return res.json({ status: false, error: login?.error || "OTP gagal", raw: login });
-        return res.json({ status: true, result: login.results });
-      }
-
-      if (action === "mutasiqr") {
-        if (!username || !token) return res.json({ status: false, error: "Parameter 'username' dan 'token' diperlukan" });
-        const ok = new OrderKuota(username, token);
-        const data = await ok.getTransactionQris();
-        if (!data?.qris_history?.results) return res.json({ status: false, error: "Mutasi tidak ada", raw: data });
-        const result = data.qris_history.results.filter(e => e.status === "IN");
-        return res.json({ status: true, result });
-      }
-
-      if (action === "profile") {
-        if (!username || !token) return res.json({ status: false, error: "Parameter 'username' dan 'token' diperlukan" });
-        const ok = new OrderKuota(username, token);
-        const data = await ok.getTransactionQris();
-        return res.json({ status: true, result: data });
-      }
-
-      if (action === "wdqr") {
-        if (!username || !token || !amount) return res.json({ status: false, error: "Parameter 'username', 'token', dan 'amount' diperlukan" });
-        const ok = new OrderKuota(username, token);
-        const wd = await ok.withdrawalQris(amount);
-        const profile = await ok.getTransactionQris();
-        return res.json({ status: true, result: { withdraw: wd || {}, profile: profile || {} } });
-      }
-
-      if (action === "createpayment") {
-        if (!amount || !codeqr) return res.json({ status: false, error: "Parameter 'amount' dan 'codeqr' diperlukan" });
-        const qr = await createQRIS(amount, codeqr);
-        if (qr.error) return res.json({ status: false, error: qr.error });
-        return res.json({ status: true, result: qr });
-      }
-
-      // Jika action tidak dikenali
-      return res.json({ status: false, error: `Action '${action}' tidak valid.` });
-
-    } catch (err) {
-      console.error("Error OrderKuota:", err.message);
-      res.json({ 
-        status: false, 
-        error: "Terjadi kesalahan pada server." 
-      });
     }
   },
-};
+  {
+    name: "Get Token",
+    desc: "Verifikasi OTP untuk mendapatkan Auth Token",
+    category: "Payment Gateway",
+    path: "/orderkuota/gettoken?username=&otp=",
+    async run(req, res) {
+      const { username, otp } = req.query;
+      if (!username || !otp) return res.json({ status: false, error: 'Missing username or otp' });
+      try {
+        const ok = new OrderKuota();
+        const login = await ok.getAuthToken(username, otp);
+        res.json({ status: true, creator: "FR3 NEWERA", result: login.results || login });
+      } catch (err) {
+        res.json({ status: false, error: err.message });
+      }
+    }
+  },
+  {
+    name: "Cek Mutasi QRIS",
+    desc: "Cek riwayat transaksi QRIS yang masuk (status IN)",
+    category: "Payment Gateway",
+    path: "/orderkuota/mutasiqr?username=&token=",
+    async run(req, res) {
+      const { username, token } = req.query;
+      if (!username || !token) return res.json({ status: false, error: 'Missing username or token' });
+      try {
+        const ok = new OrderKuota(username, token);
+        const data = await ok.getTransactionQris();
+        const result = data?.qris_history?.results?.filter(e => e.status === "IN") || [];
+        res.json({ status: true, creator: "FR3 NEWERA", result });
+      } catch (err) {
+        res.json({ status: false, error: err.message });
+      }
+    }
+  },
+  {
+    name: "Withdraw QRIS",
+    desc: "Penarikan saldo QRIS ke saldo utama",
+    category: "Payment Gateway",
+    path: "/orderkuota/wdqr?username=&token=&amount=",
+    async run(req, res) {
+      const { username, token, amount } = req.query;
+      if (!username || !token || !amount) return res.json({ status: false, error: 'Missing parameters' });
+      try {
+        const ok = new OrderKuota(username, token);
+        const wd = await ok.withdrawalQris(amount);
+        res.json({ status: true, creator: "FR3 NEWERA", result: wd });
+      } catch (err) {
+        res.json({ status: false, error: err.message });
+      }
+    }
+  },
+  {
+    name: "Create QRIS Payment",
+    desc: "Generate QR Code Payment dengan CRC16 otomatis",
+    category: "Payment Gateway",
+    path: "/orderkuota/createpayment?amount=&codeqr=",
+    async run(req, res) {
+      const { amount, codeqr } = req.query;
+      if (!amount || !codeqr) return res.json({ status: false, error: 'Amount and CodeQR are required' });
+      try {
+        const qrData = await createQRIS(amount, codeqr);
+        res.json({ status: true, creator: "FR3 NEWERA", result: qrData });
+      } catch (error) {
+        res.json({ status: false, error: error.message });
+      }
+    }
+  }
+];
